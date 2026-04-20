@@ -1,0 +1,15 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.venv/
+venv/
+*.sqlite3
+staticfiles/
+# precomputed/ is committed — it's part of the webapp's input
+db.sqlite3
+.DS_Store
+.idea/
+.vscode/
+*.swp
