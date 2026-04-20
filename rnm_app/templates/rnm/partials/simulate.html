@@ -1,0 +1,52 @@
+{% extends "rnm/base.html" %}
+{% load static %}
+{% block title %}Simulate — NP-MT-RNM{% endblock %}
+{% block head %}
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1"></script>
+  <script src="https://unpkg.com/cytoscape@3.28.1/dist/cytoscape.min.js"></script>
+{% endblock %}
+{% block content %}
+  <h2>Simulate</h2>
+  <p>Set a loading regime, optionally clamp any node, and run a single-replicate ODE solve (~1 s).</p>
+
+  <div class="simulate-controls">
+    <div class="preset-buttons">
+      <span class="label">Preset:</span>
+      <button data-preset="Hypo">Hypo</button>
+      <button data-preset="Normal">Normal</button>
+      <button data-preset="Hyper">Hyper</button>
+    </div>
+
+    <div class="slider-group">
+      <label>Hypo <input id="slider-hypo" type="number" min="0" max="1" step="0.01" value="0.01"></label>
+      <label>NL   <input id="slider-nl"   type="number" min="0" max="1" step="0.01" value="0.80"></label>
+      <label>HL   <input id="slider-hl"   type="number" min="0" max="1" step="0.01" value="0.01"></label>
+    </div>
+
+    <div class="clamp-group">
+      <label>Clamp node:
+        <select id="clamp-node">
+          <option value="">— none —</option>
+          {% for n in node_names %}<option value="{{ n }}">{{ n }}</option>{% endfor %}
+        </select>
+      </label>
+      <label>to
+        <select id="clamp-value">
+          <option value="0">0 (knockdown)</option>
+          <option value="1">1 (activation)</option>
+        </select>
+      </label>
+    </div>
+
+    <button id="run-sim">Run</button>
+    <span id="sim-status" class="muted"></span>
+  </div>
+
+  <div class="simulate-output">
+    <div id="sim-network" style="height: 400px; border: 1px solid var(--border); border-radius: 4px;"></div>
+    <canvas id="sim-bars" height="400"></canvas>
+  </div>
+{% endblock %}
+{% block scripts %}
+  <script src="{% static 'rnm/js/simulate.js' %}"></script>
+{% endblock %}

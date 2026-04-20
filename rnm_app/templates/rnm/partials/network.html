@@ -1,0 +1,15 @@
+{% extends "rnm/base.html" %}
+{% load static %}
+{% block title %}Network — NP-MT-RNM{% endblock %}
+{% block head %}
+  <script src="https://unpkg.com/cytoscape@3.28.1/dist/cytoscape.min.js"></script>
+{% endblock %}
+{% block content %}
+  <h2>Network</h2>
+  <p>147 nodes · 357 edges. Click a node to inspect; scroll to zoom. Filter by category below.</p>
+  <div id="category-filters" style="margin-bottom:10px; font-size: 12px;"></div>
+  <div id="cy" style="width: 100%; height: 70vh; border: 1px solid var(--border); border-radius: 4px;"></div>
+{% endblock %}
+{% block scripts %}
+  <script src="{% static 'rnm/js/network.js' %}"></script>
+{% endblock %}

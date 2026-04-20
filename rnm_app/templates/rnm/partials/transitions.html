@@ -1,0 +1,20 @@
+{% extends "rnm/base.html" %}
+{% load static %}
+{% block title %}Transitions — NP-MT-RNM{% endblock %}
+{% block content %}
+  <h2>Transition paths</h2>
+  <section>
+    <h3>Hypo → Normal (Fig 6A, 7A)</h3>
+    <img src="{% static 'rnm/figures/fig6_transition_ecm_A.png' %}" alt="Fig 6A" style="max-width: 100%;">
+    <img src="{% static 'rnm/figures/fig7_transition_tf_A.png' %}" alt="Fig 7A" style="max-width: 100%;">
+  </section>
+  <section>
+    <h3>Normal → Hyper (Fig 6B, 7B)</h3>
+    <img src="{% static 'rnm/figures/fig6_transition_ecm_B.png' %}" alt="Fig 6B" style="max-width: 100%;">
+    <img src="{% static 'rnm/figures/fig7_transition_tf_B.png' %}" alt="Fig 7B" style="max-width: 100%;">
+  </section>
+  <section>
+    <h3>Trajectories (Fig 8)</h3>
+    <img src="{% static 'rnm/figures/fig8_transition_trajectories.png' %}" alt="Fig 8" style="max-width: 100%;">
+  </section>
+{% endblock %}

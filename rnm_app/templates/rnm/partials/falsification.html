@@ -1,0 +1,26 @@
+{% extends "rnm/base.html" %}
+{% load static %}
+{% block title %}Falsification — NP-MT-RNM{% endblock %}
+{% block content %}
+  <h2>Falsification benchmark</h2>
+  <p>45 rules from MATLAB ANABOLIC/CATABOLIC lists. Pass rate: <strong id="pass-rate"></strong></p>
+  <img src="{% static 'rnm/figures/fig9_falsification_forest.png' %}" alt="Fig 9" style="max-width: 100%;">
+  <table id="falsification-table" class="benchmark-table">
+    <thead><tr><th>Node</th><th>Class</th><th>Δ</th><th>CI lower</th><th>CI upper</th><th>Result</th></tr></thead>
+    <tbody></tbody>
+  </table>
+{% endblock %}
+{% block scripts %}
+<script>
+  const data = {{ falsification_json|safe }};
+  const tbody = document.querySelector("#falsification-table tbody");
+  let passed = 0;
+  data.rules.forEach(r => {
+    if (r.passed) passed++;
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td>${r.node}</td><td>${r.class}</td><td>${r.delta.toFixed(3)}</td><td>${r.ci_lower.toFixed(3)}</td><td>${r.ci_upper.toFixed(3)}</td><td>${r.passed ? '✅' : '❌'}</td>`;
+    tbody.appendChild(tr);
+  });
+  document.getElementById("pass-rate").textContent = `${passed}/${data.rules.length} (${(100*passed/data.rules.length).toFixed(1)}%)`;
+</script>
+{% endblock %}

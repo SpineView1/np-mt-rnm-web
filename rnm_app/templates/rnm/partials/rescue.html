@@ -1,0 +1,44 @@
+{% extends "rnm/base.html" %}
+{% load static %}
+{% block title %}Rescue — NP-MT-RNM{% endblock %}
+{% block head %}
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1"></script>
+{% endblock %}
+{% block content %}
+  <h2>Rescue screen</h2>
+  <div class="rescue-grid">
+    <section class="rescue-published">
+      <h3>Published 35 perturbations</h3>
+      <img src="{% static 'rnm/figures/fig10_rescue_ecm.png' %}" alt="Fig 10" style="max-width: 100%;">
+      <img src="{% static 'rnm/figures/fig12_rescue_transcription.png' %}" alt="Fig 12" style="max-width: 100%;">
+      <h4>Ranked by mean |Δ| — ECM</h4>
+      <table class="rescue-table"><thead><tr><th>Perturbation</th><th>Mean|Δ| ECM</th></tr></thead><tbody id="rescue-ranked"></tbody></table>
+    </section>
+    <section class="rescue-design">
+      <h3>Design your own</h3>
+      <p class="muted">Quick preview — paper uses 100 replicates.</p>
+      <label>Anabolic ↑:
+        <select id="custom-anabolic">
+          <option value="">— none —</option>
+          <option>SOX9</option><option>PPARγ</option><option>HIF-1α</option><option>NRF2</option><option>IκBα</option>
+        </select>
+      </label>
+      <label>Catabolic ↓:
+        <select id="custom-catabolic">
+          <option value="">— none —</option>
+          <option>RhoA-E</option><option>PIEZO1</option><option>PI3K-E</option><option>FAK-E</option><option>ROS</option>
+        </select>
+      </label>
+      <button id="run-custom-rescue">Run (~15–25 s)</button>
+      <span id="rescue-status" class="muted"></span>
+      <canvas id="custom-delta-bars" height="280"></canvas>
+      <p><strong>Balance score:</strong> <span id="custom-balance"></span> — <strong>distance to Normal:</strong> <span id="custom-distance"></span></p>
+    </section>
+  </div>
+{% endblock %}
+{% block scripts %}
+<script>
+  const rescueData = {{ rescue_json|safe }};
+</script>
+<script src="{% static 'rnm/js/rescue.js' %}"></script>
+{% endblock %}
