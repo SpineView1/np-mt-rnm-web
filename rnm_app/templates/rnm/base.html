@@ -1,0 +1,36 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{% block title %}NP-MT-RNM{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'rnm/css/rnm.css' %}">
+  {% block head %}{% endblock %}
+</head>
+<body>
+  <header class="topbar">
+    <h1 class="brand">NP mechanotransduction RNM</h1>
+    <p class="subtitle">Workineh &amp; Noailly (2026) — interactive companion</p>
+  </header>
+
+  <nav class="tabs">
+    <a href="{% url 'rnm:overview' %}"      class="tab {% if active == 'overview' %}active{% endif %}">Overview</a>
+    <a href="{% url 'rnm:network' %}"       class="tab {% if active == 'network' %}active{% endif %}">Network</a>
+    <a href="{% url 'rnm:simulate' %}"      class="tab {% if active == 'simulate' %}active{% endif %}">Simulate</a>
+    <a href="{% url 'rnm:falsification' %}" class="tab {% if active == 'falsification' %}active{% endif %}">Falsification</a>
+    <a href="{% url 'rnm:transitions' %}"   class="tab {% if active == 'transitions' %}active{% endif %}">Transitions</a>
+    <a href="{% url 'rnm:rescue' %}"        class="tab {% if active == 'rescue' %}active{% endif %}">Rescue</a>
+    <a href="{% url 'rnm:downloads' %}"     class="tab {% if active == 'downloads' %}active{% endif %}">Downloads</a>
+  </nav>
+
+  <main class="content">
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="footer">
+    <p>MIT license · <a href="https://github.com/SpineView1/np-mt-rnm">model repo</a> · <a href="https://github.com/SpineView1/np-mt-rnm-web">webapp repo</a></p>
+  </footer>
+  {% block scripts %}{% endblock %}
+</body>
+</html>
