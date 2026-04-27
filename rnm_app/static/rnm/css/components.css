@@ -1,0 +1,29 @@
+/* Minimal supplements on top of Bootstrap 5 for the NP-MT-RNM webapp. */
+
+.nav-tabs .nav-link {
+  color: #495057;
+}
+.nav-tabs .nav-link.active {
+  color: #0d6efd;
+  font-weight: 500;
+}
+
+.clamp-row {
+  display: grid;
+  grid-template-columns: 1fr 90px 32px;
+  gap: 6px;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.clamp-row select,
+.clamp-row input {
+  font-size: 0.85rem;
+}
+
+#sim-status.error {
+  color: #b02a37;
+}
+#sim-status.ok {
+  color: #146c43;
+}

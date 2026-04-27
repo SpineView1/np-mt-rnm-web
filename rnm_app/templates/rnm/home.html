@@ -1,0 +1,181 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>NP-MT-RNM — interactive companion</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="{% static 'rnm/css/components.css' %}">
+  <script src="https://unpkg.com/cytoscape@3.28.1/dist/cytoscape.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+</head>
+<body class="bg-light">
+  <header class="container-fluid bg-white border-bottom py-3 mb-3">
+    <div class="container">
+      <h1 class="h3 mb-0">NP mechanotransduction RNM</h1>
+      <p class="text-muted mb-0">Workineh &amp; Noailly (2026) — interactive companion</p>
+    </div>
+  </header>
+
+  <main class="container">
+    <ul class="nav nav-tabs" id="rnmTab" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview" type="button" role="tab">Overview</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="network-tab" data-bs-toggle="tab" data-bs-target="#network" type="button" role="tab">Network</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="simulate-tab" data-bs-toggle="tab" data-bs-target="#simulate" type="button" role="tab">Simulation</button>
+      </li>
+    </ul>
+
+    <div class="tab-content bg-white border border-top-0 p-4" id="rnmTabContent">
+
+      <!-- ==================== Overview ==================== -->
+      <div class="tab-pane fade show active" id="overview" role="tabpanel">
+        <h2 class="h4">Model overview</h2>
+        <p>
+          This is the interactive companion to the NP-MT-RNM regulatory-network model
+          described in Workineh &amp; Noailly (2026). The simulation engine is
+          <a href="https://tellurium.readthedocs.io/" target="_blank" rel="noopener">tellurium</a>,
+          driven by the SBML export of the network used in the paper. Use the Network
+          tab to explore the topology, and the Simulation tab to run the model live
+          with custom boundary regimes and node clamps.
+        </p>
+
+        <h3 class="h5 mt-4">Model summary</h3>
+        <table class="table table-sm w-auto">
+          <tbody>
+            <tr><th scope="row">Total species</th><td>{{ summary.n_species }}</td></tr>
+            <tr><th scope="row">Boundary species</th><td>{{ summary.n_boundary }}</td></tr>
+            <tr><th scope="row">Rate rules</th><td>{{ summary.n_rate_rules }}</td></tr>
+            <tr><th scope="row">Hill exponent <code>h</code></th><td>{{ summary.h }}</td></tr>
+            <tr><th scope="row">Decay rate <code>gamma</code></th><td>{{ summary.gamma }}</td></tr>
+          </tbody>
+        </table>
+
+        <h3 class="h5 mt-4">Citation</h3>
+        <p class="text-muted">
+          Workineh, Z. &amp; Noailly, J. (2026). <em>A regulatory-network model of
+          NP-cell mechanotransduction.</em> (paper draft — submission pending).
+        </p>
+      </div>
+
+      <!-- ==================== Network ==================== -->
+      <div class="tab-pane fade" id="network" role="tabpanel">
+        <h2 class="h4">Regulatory network</h2>
+        <p>147 nodes &middot; 357 edges. Click a node to inspect; scroll to zoom. Filter by category below.</p>
+        <div id="category-filters" class="mb-2 small"></div>
+        <div id="cy" style="width: 100%; height: 70vh; border: 1px solid #dee2e6; border-radius: 4px;"></div>
+      </div>
+
+      <!-- ==================== Simulation ==================== -->
+      <div class="tab-pane fade" id="simulate" role="tabpanel">
+        <h2 class="h4">Live simulation</h2>
+        <p>
+          Pick a boundary regime and (optionally) clamp specific species' initial
+          concentrations. Each run integrates the ODE system from t=0 to <code>t_end</code>
+          and reports the trajectory + final-vs-initial ranking for the top-20 species.
+        </p>
+
+        <div class="row g-3">
+          <div class="col-lg-4">
+            <div class="card mb-3">
+              <div class="card-header">Boundary regime</div>
+              <div class="card-body">
+                <div class="btn-group btn-group-sm mb-3" role="group" aria-label="Regime presets">
+                  <button type="button" class="btn btn-outline-primary" data-preset="hypo">Hypo</button>
+                  <button type="button" class="btn btn-outline-primary active" data-preset="normal">Normal</button>
+                  <button type="button" class="btn btn-outline-primary" data-preset="hyper">Hyper</button>
+                </div>
+                <div class="mb-2">
+                  <label for="reg-hypo" class="form-label small mb-0">Hypo</label>
+                  <input type="number" id="reg-hypo" class="form-control form-control-sm" min="0" max="1" step="0.01" value="0.01">
+                </div>
+                <div class="mb-2">
+                  <label for="reg-nl" class="form-label small mb-0">NL (normal load)</label>
+                  <input type="number" id="reg-nl" class="form-control form-control-sm" min="0" max="1" step="0.01" value="0.80">
+                </div>
+                <div class="mb-2">
+                  <label for="reg-hl" class="form-label small mb-0">HL (high load)</label>
+                  <input type="number" id="reg-hl" class="form-control form-control-sm" min="0" max="1" step="0.01" value="0.01">
+                </div>
+              </div>
+            </div>
+
+            <div class="card mb-3">
+              <div class="card-header d-flex justify-content-between align-items-center">
+                <span>Clamps</span>
+                <button type="button" class="btn btn-sm btn-outline-secondary" id="add-clamp">+ Add clamp</button>
+              </div>
+              <div class="card-body">
+                <div id="clamp-rows"></div>
+                <p class="form-text mb-0">
+                  Up to 10 species. Note: this is an initial-concentration override,
+                  not a hard clamp — the species is free to drift after t=0.
+                </p>
+              </div>
+            </div>
+
+            <div class="card mb-3">
+              <div class="card-header">Integration</div>
+              <div class="card-body">
+                <div class="row g-2">
+                  <div class="col">
+                    <label for="t-end" class="form-label small mb-0">t_end</label>
+                    <input type="number" id="t-end" class="form-control form-control-sm" min="1" max="200" step="1" value="100">
+                  </div>
+                  <div class="col">
+                    <label for="n-points" class="form-label small mb-0">n_points</label>
+                    <input type="number" id="n-points" class="form-control form-control-sm" min="2" max="201" step="1" value="51">
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <button type="button" id="run-sim" class="btn btn-primary w-100">Run simulation</button>
+            <p class="small text-muted mt-2 mb-0" id="sim-status">Ready.</p>
+          </div>
+
+          <div class="col-lg-8">
+            <div class="card mb-3">
+              <div class="card-header">Initial vs final (top 20 by |Δ|)</div>
+              <div class="card-body">
+                <canvas id="bar-chart" height="320"></canvas>
+              </div>
+            </div>
+            <div class="card mb-3">
+              <div class="card-header">Trajectories</div>
+              <div class="card-body">
+                <canvas id="line-chart" height="320"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <footer class="container my-4 small text-muted">
+    MIT license &middot;
+    <a href="https://github.com/SpineView1/np-mt-rnm">model repo</a> &middot;
+    <a href="https://github.com/SpineView1/np-mt-rnm-web">webapp repo</a>
+  </footer>
+
+  {{ species_list|json_script:"np-mt-rnm-species" }}
+  <script>
+    try {
+      window.NP_MT_RNM_SPECIES = JSON.parse(document.getElementById("np-mt-rnm-species").textContent);
+    } catch (e) {
+      window.NP_MT_RNM_SPECIES = [];
+    }
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="{% static 'rnm/js/network.js' %}"></script>
+  <script type="module" src="{% static 'rnm/js/simulator.js' %}"></script>
+</body>
+</html>
