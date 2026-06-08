@@ -589,21 +589,24 @@ class RunSimulation(APIView):
             }, status=500)
 
     def _generate_bar_plot(self, species_names, concentrations, initial_concentrations):
-        plt.figure(figsize=(28, 9))
-        
-        # Use fixed order for species
+        # Wide canvas so 147 species' Initial/Final bar pairs each get enough
+        # horizontal pixels (~ 0.3 in per species) to render thick, readable bars.
         species = FIXED_ORDER
+        n = len(species)
+        per_species_inches = 0.3
+        fig_w = max(20.0, n * per_species_inches)  # ~44 in for 147 species
+        plt.figure(figsize=(fig_w, 10))
+
         initial_values = [initial_concentrations.get(s, 0) for s in species]
-        final_values = [concentrations.get(s, 0) for s in species]  # Use get() to handle missing values
-        
-        x = np.arange(len(species))
-        width = 0.35
-        
-        # Plot initial concentrations
-        plt.bar(x - width/2, initial_values, width, label='Initial', color='skyblue')
-        
-        # Plot final concentrations
-        plt.bar(x + width/2, final_values, width, label='Final', color='yellow')
+        final_values = [concentrations.get(s, 0) for s in species]
+
+        x = np.arange(n)
+        width = 0.42  # bars almost touching their sibling but never the next pair
+
+        plt.bar(x - width/2, initial_values, width, label='Initial', color='skyblue',
+                edgecolor='black', linewidth=0.3)
+        plt.bar(x + width/2, final_values, width, label='Final', color='yellow',
+                edgecolor='black', linewidth=0.3)
         
         # Add grid and labels
         plt.xlabel('Nodes (Species)')
