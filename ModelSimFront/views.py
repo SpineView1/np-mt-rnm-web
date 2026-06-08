@@ -32,27 +32,41 @@ logger = logging.getLogger(__name__)
 
 # Add at the top of your file
 FIXED_ORDER = [
-    # Mechanical loading inputs (boundary species)
-    'Hypo', 'NL', 'HL',
-    # Mechanosensors & mechano-effectors
-    'TRPV4', 'PIEZO1', 'YAP_TAZ',
-    # Healthy / anabolic ECM and master regulator
-    'ACAN', 'COL2A1', 'SOX9',
-    # Maladaptive ECM (fibrotic / hypertrophic)
-    'COL1A1', 'COL10A1',
+    # Mechanical inputs & mechanosensors
+    'Hypo', 'NL', 'HL', 'alpha5beta1_FN', 'alpha5beta1_Fs', 'alphaVbeta3', 'alphaVbeta6', 
+    'SDC4_E', 'SDC4_M', 'TRPV4', 'PIEZO1', 
+    # Ion channels & related (Ca2+ signalling)
+    'Ca2plusos', 'Ca2plussu', 'CaMKII', 'PKC_E', 'PKC_M', 'PLCgamma_M', 'PLCgamma_E', 'CaN', 
+    'IP3', 'PLA2', 'AQP1', 'AQP5', 
+    # Rho GTPases, cytoskeletal & Hippo regulators
+    'RhoA_M', 'RhoA_E', 'RAC1_M', 'RAC1_E', 'CDC42', 'ROCK_M', 'ROCK_E', 'PAK1', 'PKN1', 
+    'FAK_M', 'FAK_E', 'MST1_2', 'LATS1_2', 
+    # MAPK & stress-activated kinases
+    'RAS_M', 'RAS_E', 'RAF_M', 'RAF_E', 'MEK_M', 'MEK_E', 'ERK_M', 'ERK_E', 'MKK3_6', 'MKK4_7', 
+    'JNK', 'P38', 'RSK', 'TAK1', 
+    # Metabolic & related
+    'LKB1', 'NADplus', 'AMPK', 'mTORC1', 'mTORC2', 'SIRT1', 'PI3K_M', 'PI3K_E', 'PIP3_M', 
+    'PIP3_E', 'PDK1_M', 'PDK1_E', 'AKT1_M', 'AKT1_E', 'GSK3B', 'ULK1', 'PTEN', 'PLD2', 'PGE2', 
+    'COX_2', 'CAT', 'GPX1', 'SOD1', 'SOD2', 'HO_1', 'PHD2', 'VHL', 'Rheb', 'NutD', 'MitD', 
+    # Oxidative-stress defense & proteostasis
+    'HSP70', 'HSP27', 'ROS', 
+    # Transcription factors
+    'CREB', 'HIF_1alpha', 'HIF_2alpha', 'NF_kappaB', 'AP_1', 'FOXO', 'SOX9', 'NFAT', 'RUNX2', 
+    'YAP_TAZ', 'MRTF_A', 'NRF2', 'HSF1', 'TonEBP', 'ELK1', 'PPARgamma', 'CITED2', 
     # Growth factors
-    'TGFbeta', 'IGF1', 'GDF5',
-    # Hypoxia axis
-    'HIF_1alpha', 'HIF_2alpha', 'VHL',
-    # Inflammatory mediators
-    'TNF', 'IL6', 'IL1beta', 'IL8', 'CCL2', 'NF_kappaB',
-    # Signaling kinases
-    'ERK_M', 'AKT1_M', 'JNK',
-    # Catabolic enzymes
-    'MMP1', 'MMP3', 'MMP13', 'ADAMTS4_5',
-    # Tissue inhibitor & angiogenesis
-    'TIMP3', 'VEGF',
+    'TGFbeta', 'VEGF', 'IGF1', 'BMP2', 'CCN2', 'GDF5', 'FGF2', 'FGF18', 'Wnt3a', 'Wnt5a', 
+    # ECM anabolism & phenotype markers
+    'COL2A1', 'COL1A1', 'COL10A1', 'ACAN', 'TIMP3', 
+    # Cytokines, chemokines, proteases
+    'TNF', 'IL6', 'IL1beta', 'IL8', 'CCL2', 'CXCL1', 'CXCL3', 'ADAMTS4_5', 'MMP1', 'MMP3', 
+    'MMP13', 
+    # Cell survival, apoptosis, mitophagy
+    'Bcl2', 'BAX', 'CASP3', 'CASP9', 'BNIP3', 'GADD45', 'DRP1', 'MOMP', 
+    # Other regulators
+    'ANXA1', 'BAD', 'DAG', 'IKK', 'iNOS', 'IkappaBalpha', 'LIMK1', 'MAP3K', 'SMIT1', 'SOX5', 
+    'SOX6', 'TAUT', 'beta_catenin', 
 ]
+
 
 
 # Define model classes (Compartment, Species, Reaction, UnitDefinition, Parameter, Event)
@@ -575,7 +589,7 @@ class RunSimulation(APIView):
             }, status=500)
 
     def _generate_bar_plot(self, species_names, concentrations, initial_concentrations):
-        plt.figure(figsize=(15, 8))
+        plt.figure(figsize=(28, 9))
         
         # Use fixed order for species
         species = FIXED_ORDER
@@ -595,7 +609,7 @@ class RunSimulation(APIView):
         plt.xlabel('Nodes (Species)')
         plt.ylabel('Concentration')
         plt.title('Node Concentrations')
-        plt.xticks(x, species, rotation=45, ha='right')
+        plt.xticks(x, species, rotation=70, ha='right', fontsize=8)
         plt.grid(True, axis='y', linestyle='--', alpha=0.7)
         plt.legend()
         
