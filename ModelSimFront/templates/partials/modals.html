@@ -1,0 +1,48 @@
+<div class="modal fade" id="nodeTrayModal" tabindex="-1" aria-labelledby="nodeTrayModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="nodeTrayModalLabel">Node Tray</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="table-responsive">
+            <table class="table table-sm">
+              <thead>
+                <tr>
+                  <th>Node Name</th>
+                  <th>Clamp</th>
+                  <th>State</th>
+                  <th>Initial Concentration</th>
+                </tr>
+              </thead>
+              <tbody id="nodeTrayBody">
+                <!-- This will be populated dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary btn-sm" id="saveNodeTray">Save changes</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Simulation Results Modal -->
+  <div id="simulation-modal" class="modal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Simulation Results</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div id="plot-container"></div>
+          <div id="results-container"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
