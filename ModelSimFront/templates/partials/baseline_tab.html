@@ -1,0 +1,30 @@
+{% load static %}
+<div class="tab-pane fade show active" id="baseline" role="tabpanel" aria-labelledby="baseline-tab">
+  <div class="card">
+    <div class="card-body">
+      <h5 class="card-title mb-1">Baseline steady-state responses</h5>
+      <p class="text-muted mb-3" style="max-width: 62rem;">
+        Steady-state activation under Hypo (blue), Normal (green) and Hyper (red)
+        chronic loading, grouped by biological function.
+        <strong>(A)</strong> ECM anabolism and phenotype markers;
+        <strong>(B)</strong> Growth factors;
+        <strong>(C)</strong> Transcription factors;
+        <strong>(D)</strong> Cytokines, chemokines, proteases, and related mediators.
+      </p>
+
+      <div class="d-flex flex-wrap align-items-center gap-3 mb-3"
+           id="baseline-regime-toggles" role="group"
+           aria-label="Show or hide loading regimes">
+        <span class="fw-semibold me-1">Loading regime:</span>
+        <!-- Populated from the bundle so the labels and colours cannot drift
+             out of step with the data. -->
+      </div>
+
+      <div class="row g-3" id="baseline-panels">
+        <!-- One column per Figure 4 panel, filled in by baseline_panels.js. -->
+      </div>
+
+      <p class="text-muted small mt-3 mb-0" id="baseline-provenance"></p>
+    </div>
+  </div>
+</div>
