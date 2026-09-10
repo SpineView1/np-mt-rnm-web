@@ -40,8 +40,14 @@ function initializeEventListeners() {
             console.log("Update Parameters form submitted");
             alert("Updating");
             handleParameterUpdate();
-            
+
         });
+    }
+
+    // Download Results CSV button (top right of Simulation Results modal).
+    const downloadCsvButton = document.getElementById("download-results-csv");
+    if (downloadCsvButton) {
+        downloadCsvButton.addEventListener("click", downloadResultsCsv);
     }
 }
 
@@ -221,37 +227,17 @@ function runSimulation() {
             throw new Error(data.message || "Simulation failed");
         }
 
-        // Update plot
+        // Update plot — fill the modal body, preserving aspect ratio.
         const plotContainer = document.getElementById("plot-container");
         if (plotContainer) {
-            plotContainer.innerHTML = `<img src="${data.bar_plot_url}" alt="Bar Plot" style="max-width: 100%; height: auto;">`;
+            plotContainer.innerHTML = `<img src="${data.bar_plot_url}" alt="Simulation bar plot">`;
         }
 
-        // Update results table
-        const resultsContainer = document.getElementById("results-container");
-        if (resultsContainer) {
-            let resultsHtml = "<h3>Simulation Results</h3><table><tr><th>Species</th><th>Initial Concentration</th><th>Final Concentration</th></tr>";
-            
-            // Get unique set of all species from both concentrations
-            const allSpecies = Array.from(new Set([
-                ...Object.keys(data.initial_concentrations || {}),
-                ...Object.keys(data.final_concentrations || {})
-            ])).sort();
-
-            allSpecies.forEach(species => {
-                const initialValue = (data.initial_concentrations && data.initial_concentrations[species]) || 0;
-                const finalValue = (data.final_concentrations && data.final_concentrations[species]) || 0;
-                
-                resultsHtml += `<tr>
-                    <td>${species}</td>
-                    <td>${Number(initialValue).toFixed(6)}</td>
-                    <td>${Number(finalValue).toFixed(6)}</td>
-                </tr>`;
-            });
-            
-            resultsHtml += "</table>";
-            resultsContainer.innerHTML = resultsHtml;
-        }
+        // Stash results for CSV download.
+        window.__lastSimulationResults = {
+            initial_concentrations: data.initial_concentrations || {},
+            final_concentrations:   data.final_concentrations   || {},
+        };
 
         // Show results modal
         const simulationModal = new bootstrap.Modal(document.getElementById('simulation-modal'));
@@ -273,40 +259,40 @@ function updatePlot(plotUrl) {
     }
 }
 
-function updateResults(data) {
-    const resultsContainer = document.getElementById("results-container");
-    if (!resultsContainer) return;
-
-    const allSpecies = new Set([
+function downloadResultsCsv() {
+    const data = window.__lastSimulationResults;
+    if (!data) {
+        alert("No simulation results yet — run a simulation first.");
+        return;
+    }
+    const allSpecies = Array.from(new Set([
         ...Object.keys(data.initial_concentrations || {}),
-        ...Object.keys(data.final_concentrations || {})
-    ]);
+        ...Object.keys(data.final_concentrations   || {})
+    ])).sort();
 
-    let resultsHtml = `
-        <h3>Simulation Results</h3>
-        <table>
-            <tr>
-                <th>Species</th>
-                <th>Initial Concentration</th>
-                <th>Final Concentration</th>
-            </tr>
-    `;
-
+    const rows = [["species", "initial_concentration", "final_concentration"]];
     allSpecies.forEach(species => {
-        const initial = data.initial_concentrations?.[species] || 0;
-        const final = data.final_concentrations?.[species] || 0;
-        
-        resultsHtml += `
-            <tr>
-                <td>${species}</td>
-                <td>${Number(initial).toFixed(6)}</td>
-                <td>${Number(final).toFixed(6)}</td>
-            </tr>
-        `;
+        const initial = data.initial_concentrations?.[species] ?? 0;
+        const final   = data.final_concentrations?.[species]   ?? 0;
+        rows.push([species, Number(initial).toString(), Number(final).toString()]);
     });
+    const csv = rows.map(r =>
+        r.map(cell => {
+            const s = String(cell);
+            return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+        }).join(",")
+    ).join("\n");
 
-    resultsHtml += "</table>";
-    resultsContainer.innerHTML = resultsHtml;
+    const ts = new Date().toISOString().replace(/[:.]/g, "-").replace("T", "_").slice(0, 19);
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `simulation_results_${ts}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
 }
 
 // Cleanup on page unload

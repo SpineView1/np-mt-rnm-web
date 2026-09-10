@@ -19,10 +19,14 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
+from django.views.generic import RedirectView
 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    # The app lives under /network-model/; send the bare root there rather than
+    # serving a 404 to anyone who opens the site without the path.
+    path('', RedirectView.as_view(pattern_name='view_sbml', permanent=False)),
     path('network-model/', include('ModelSimFront.urls')),
 ]
 urlpatterns += staticfiles_urlpatterns()
