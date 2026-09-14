@@ -213,7 +213,7 @@
   }
 
   document.addEventListener("DOMContentLoaded", function () {
-    var urlHolder = el("baseline-data-url");
+    var urlHolder = el("panel-data-url");
     if (!urlHolder || typeof Chart === "undefined" || !window.NPMT) {
       return;
     }
