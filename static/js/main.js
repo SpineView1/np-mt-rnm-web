@@ -132,9 +132,14 @@ function saveClampedNodes() {
         const checkbox = row.querySelector('.node-checkbox');
         const valueInput = row.querySelector('.node-value');
         if (checkbox && checkbox.checked) {
+            // Do NOT use `|| 1` here: 0 is falsy, so that silently rewrote every
+            // knock-down to 1. The published rescue strategies clamp catabolic
+            // nodes to exactly 0 (FAK-E, ROS, PIEZO1, RhoA-E, PI3K-E), so a
+            // clamp of 0 has to survive.
+            var parsed = parseFloat(valueInput.value);
             clampedNodes.push({
                 id: checkbox.value,
-                value: parseFloat(valueInput.value) || 1
+                value: Number.isFinite(parsed) ? parsed : 1
             });
         }
     });

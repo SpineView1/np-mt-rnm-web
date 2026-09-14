@@ -854,3 +854,109 @@ class CheckModelState(APIView):
                 'success': False,
                 'message': f"An error occurred: {str(e)}"
             }, status=500)
+
+class EnsembleView(View):
+    """Replicate ensemble over the session's currently clamped model.
+
+    The webapp's other simulation endpoint integrates once from the model's
+    stored initial concentrations. That is the wrong statistic to plot next to
+    the published baselines, and actively misleading for this model: under
+    Hyper loading only ~27% of random initial conditions settle in the anabolic
+    attractor, so a single trajectory reports one attractor as if it were the
+    answer.
+
+    So this runs the same 100-replicate design the MATLAB scripts use --
+    uniform random initial conditions on [0, 1] for every free species,
+    integrate to t=100, take the mean and SD across replicates.
+
+    Clamped nodes come from the session's SBML, which ClampNodesView has
+    already rewritten (rate rule removed, boundary + constant set). Clamped
+    species are therefore boundary species here and are left untouched, while
+    the free ones get randomised -- no clamping logic is duplicated.
+    """
+
+    N_REPS_DEFAULT = 100
+    N_REPS_MAX = 200
+    T_END = 100.0
+
+    def post(self, request):
+        try:
+            payload = json.loads(request.body or "{}")
+            n_reps = int(payload.get("n_reps", self.N_REPS_DEFAULT))
+            n_reps = max(1, min(n_reps, self.N_REPS_MAX))
+            seed = int(payload.get("seed", 0))
+
+            sbml_path = request.session.get("temp_sbml_path", "")
+            if not sbml_path or not os.path.exists(sbml_path):
+                return JsonResponse(
+                    {"success": False, "message": "No model session. Reload the page."},
+                    status=400,
+                )
+
+            # id -> display name, so the client can group by the node names the
+            # published category lists use (e.g. "ADAMTS4/5", not "ADAMTS4_5").
+            document = libsbml.SBMLReader().readSBML(sbml_path)
+            model = document.getModel()
+            if model is None:
+                return JsonResponse(
+                    {"success": False, "message": "Session SBML could not be read."},
+                    status=500,
+                )
+            display_name = {}
+            for i in range(model.getNumSpecies()):
+                sp = model.getSpecies(i)
+                display_name[sp.getId()] = sp.getName() or sp.getId()
+
+            rr = roadrunner.RoadRunner(sbml_path)
+            rr.integrator.setValue("relative_tolerance", 1e-8)
+            rr.integrator.setValue("absolute_tolerance", 1e-10)
+
+            free_ids = list(rr.model.getFloatingSpeciesIds())
+            clamped_ids = list(rr.model.getBoundarySpeciesIds())
+            clamped_values = {sid: float(rr[sid]) for sid in clamped_ids}
+
+            rng = np.random.default_rng(seed)
+            samples = np.zeros((n_reps, len(free_ids)), dtype=float)
+
+            for r in range(n_reps):
+                rr.resetAll()
+                # resetAll restores the SBML initial values, which also restores
+                # every clamp, so the clamped species stay put across replicates.
+                x0 = rng.uniform(0.0, 1.0, size=len(free_ids))
+                for i, sid in enumerate(free_ids):
+                    rr[sid] = float(x0[i])
+                rr.simulate(0.0, self.T_END, 2)
+                samples[r] = [rr[sid] for sid in free_ids]
+
+            mean = samples.mean(axis=0)
+            sd = samples.std(axis=0, ddof=1) if n_reps > 1 else np.zeros(len(free_ids))
+
+            nodes = {}
+            for i, sid in enumerate(free_ids):
+                nodes[display_name.get(sid, sid)] = {
+                    "mean": float(mean[i]),
+                    "std": float(sd[i]),
+                }
+            # Clamped species are held, so they have no spread.
+            for sid in clamped_ids:
+                nodes[display_name.get(sid, sid)] = {
+                    "mean": clamped_values[sid],
+                    "std": 0.0,
+                }
+
+            return JsonResponse({
+                "success": True,
+                "n_reps": n_reps,
+                "nodes": nodes,
+                "clamped": {
+                    display_name.get(sid, sid): clamped_values[sid]
+                    for sid in clamped_ids
+                },
+            })
+
+        except Exception as exc:  # noqa: BLE001 - surfaced to the client
+            logger.exception("Error in EnsembleView")
+            return JsonResponse(
+                {"success": False, "message": f"An error occurred: {exc}"},
+                status=500,
+            )
