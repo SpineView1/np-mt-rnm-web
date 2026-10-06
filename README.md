@@ -4,7 +4,7 @@ Interactive web interface for the **Mechanotransduction Regulatory Network Model
 
 Companion to the model repository: [SpineView1/np-mt-rnm](https://github.com/SpineView1/np-mt-rnm).
 
-Paper: *A systems-level network model reveals how mechanical loading organizes regulatory states and transitions in nucleus pulposus cells* (Workineh, Chemorion, Noailly — 2026).
+Paper: *A systems-level network model reveals mechanical regulation of nucleus pulposus cell states* (Workineh, Chemorion, Noailly — 2026). The bundled SBML is the manuscript's 147-node, 357-edge network, exported from [np-mt-rnm](https://github.com/SpineView1/np-mt-rnm).
 
 ---
 
@@ -12,7 +12,7 @@ Paper: *A systems-level network model reveals how mechanical loading organizes r
 
 - Browse the SBML model: **147 species** spanning mechanical inputs, mechanosensors, signaling cascades, transcription factors, ECM, growth factors, cytokines, MMPs, and metabolic / hypoxia nodes.
 - Simulate from a basal **Normal-loading** anabolic steady state with [tellurium](https://tellurium.analogmachine.org/).
-- **Clamp any species** to a fixed value to impose mechanical regimes (e.g. `Hypo = 0.80` for hypo-loading, `HL = 0.80` for hyper-loading) or perturbations (`MMP13 = 1`, `SOX9 = 0`, …).
+- **Clamp any species** to a fixed value to impose mechanical regimes (e.g. `Hypo = 0.20` for hypo-loading, `HL = 0.80` for hyper-loading) or perturbations (`MMP13 = 1`, `SOX9 = 0`, …).
 - Bar plot of initial vs final activation across 31 paper-figure markers (ECM, mechanosensors, growth factors, hypoxia axis, inflammatory mediators, catabolic enzymes).
 - Download the live SBML.
 
@@ -56,11 +56,11 @@ The container runs `manage.py migrate` + `collectstatic` at startup, then serves
 
 ## Mechanical loading regimes
 
-The model exposes three boundary species — `Hypo`, `NL` (normal loading), and `HL` (hyper loading). Each regime clamps two of them low and one high:
+The model exposes three boundary species — `Hypo`, `NL` (normal loading), and `HL` (hyper loading). Each regime clamps two of them low and one high (manuscript Section 2.2):
 
 | Regime | Hypo | NL | HL |
 |---|---|---|---|
-| Hypo-loading | **0.80** | 0.01 | 0.01 |
+| Hypo-loading | **0.20** | 0.01 | 0.01 |
 | Normal loading (basal) | 0.01 | **0.80** | 0.01 |
 | Hyper-loading | 0.01 | 0.01 | **0.80** |
 

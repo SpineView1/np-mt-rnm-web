@@ -180,6 +180,17 @@
         100% { transform:translate(0.5px)} 
         }
         </style>
+  <style>
+    .paper-chart { position: relative; height: 380px; }
+    .paper-chart.tall { height: 640px; }
+    .heat-wrap { overflow-x: auto; }
+    table.heat { border-collapse: collapse; font-size: 12px; font-weight: 600; }
+    table.heat td { min-width: 64px; height: 34px; text-align: center; border: 1px solid #333; padding: 2px 4px; }
+    table.heat th.rl { text-align: right; padding-right: 8px; white-space: nowrap; font-weight: 700; }
+    table.heat tfoot th { text-align: center; font-weight: 700; padding-top: 4px; }
+    #rescue-heat table.heat td { min-width: 34px; height: 26px; font-size: 10px; }
+    #rescue-heat table.heat tfoot th { writing-mode: vertical-rl; transform: rotate(180deg); white-space: nowrap; font-size: 11px; }
+  </style>
 </head>
 <body>
   <div class="container mt-5 position-relative">
@@ -192,6 +203,7 @@
       {% include "partials/units_tab.html" %}
       {% include "partials/compartments_tab.html" %}
       {% include "partials/reactions_tab.html" %}
+      {% include "partials/paper_tab.html" %}
       {% include "partials/simulation_tab.html" %}
     </div>
   </div>
@@ -209,6 +221,7 @@
   <script src="{% static 'js/rnm_panels.js' %}"></script>
   <script src="{% static 'js/simulation_panels.js' %}"></script>
   <script src="{% static 'js/main.js' %}"></script>
+  <script src="{% static 'js/paper_results.js' %}"></script>
   <script>
     // Initialize Bootstrap tabs
     document.addEventListener('DOMContentLoaded', function() {

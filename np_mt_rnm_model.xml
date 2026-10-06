@@ -4,7 +4,7 @@
     <notes>
       <body xmlns="http://www.w3.org/1999/xhtml">
         <h1>NP Mechanotransduction Regulatory Network Model</h1>
-        <p>147 nodes, 277 activation edges, 76 inhibition edges.</p>
+        <p>147 nodes, 281 activation edges, 76 inhibition edges.</p>
         <p>Mathematical framework: Mendoza/SQUADS ODE (Mendoza &amp; Xenarios 2006). Each non-stimulus species rate rule: dx/dt = sigmoid(omega; h) - gamma*x. Parameters: h=10.0, gamma=1.0, alpha=beta=1.</p>
         <p>Boundary (clampable input) species: HL, NL, Hypo.</p>
       </body>
@@ -7228,10 +7228,10 @@
                           <divide/>
                           <apply>
                             <plus/>
-                            <cn type="integer"> 4 </cn>
+                            <cn type="integer"> 5 </cn>
                             <cn type="integer"> 1 </cn>
                           </apply>
-                          <cn type="integer"> 4 </cn>
+                          <cn type="integer"> 5 </cn>
                         </apply>
                         <apply>
                           <divide/>
@@ -7241,6 +7241,7 @@
                             <ci> JNK </ci>
                             <ci> mTORC1 </ci>
                             <ci> P38 </ci>
+                            <ci> NutD </ci>
                           </apply>
                           <apply>
                             <plus/>
@@ -7249,6 +7250,7 @@
                             <ci> JNK </ci>
                             <ci> mTORC1 </ci>
                             <ci> P38 </ci>
+                            <ci> NutD </ci>
                           </apply>
                         </apply>
                         <apply>
@@ -7316,10 +7318,10 @@
                             <divide/>
                             <apply>
                               <plus/>
-                              <cn type="integer"> 4 </cn>
+                              <cn type="integer"> 5 </cn>
                               <cn type="integer"> 1 </cn>
                             </apply>
-                            <cn type="integer"> 4 </cn>
+                            <cn type="integer"> 5 </cn>
                           </apply>
                           <apply>
                             <divide/>
@@ -7329,6 +7331,7 @@
                               <ci> JNK </ci>
                               <ci> mTORC1 </ci>
                               <ci> P38 </ci>
+                              <ci> NutD </ci>
                             </apply>
                             <apply>
                               <plus/>
@@ -7337,6 +7340,7 @@
                               <ci> JNK </ci>
                               <ci> mTORC1 </ci>
                               <ci> P38 </ci>
+                              <ci> NutD </ci>
                             </apply>
                           </apply>
                           <apply>
@@ -16614,10 +16618,10 @@
                           <divide/>
                           <apply>
                             <plus/>
-                            <cn type="integer"> 3 </cn>
+                            <cn type="integer"> 4 </cn>
                             <cn type="integer"> 1 </cn>
                           </apply>
-                          <cn type="integer"> 3 </cn>
+                          <cn type="integer"> 4 </cn>
                         </apply>
                         <apply>
                           <divide/>
@@ -16626,6 +16630,7 @@
                             <ci> Ca2plussu </ci>
                             <ci> DRP1 </ci>
                             <ci> ROCK_E </ci>
+                            <ci> NutD </ci>
                           </apply>
                           <apply>
                             <plus/>
@@ -16633,6 +16638,7 @@
                             <ci> Ca2plussu </ci>
                             <ci> DRP1 </ci>
                             <ci> ROCK_E </ci>
+                            <ci> NutD </ci>
                           </apply>
                         </apply>
                         <apply>
@@ -16700,10 +16706,10 @@
                             <divide/>
                             <apply>
                               <plus/>
-                              <cn type="integer"> 3 </cn>
+                              <cn type="integer"> 4 </cn>
                               <cn type="integer"> 1 </cn>
                             </apply>
-                            <cn type="integer"> 3 </cn>
+                            <cn type="integer"> 4 </cn>
                           </apply>
                           <apply>
                             <divide/>
@@ -16712,6 +16718,7 @@
                               <ci> Ca2plussu </ci>
                               <ci> DRP1 </ci>
                               <ci> ROCK_E </ci>
+                              <ci> NutD </ci>
                             </apply>
                             <apply>
                               <plus/>
@@ -16719,6 +16726,7 @@
                               <ci> Ca2plussu </ci>
                               <ci> DRP1 </ci>
                               <ci> ROCK_E </ci>
+                              <ci> NutD </ci>
                             </apply>
                           </apply>
                           <apply>
@@ -21560,7 +21568,27 @@
                     <ci> h </ci>
                     <apply>
                       <minus/>
-                      <cn type="integer"> 0 </cn>
+                      <apply>
+                        <times/>
+                        <apply>
+                          <divide/>
+                          <apply>
+                            <plus/>
+                            <cn type="integer"> 1 </cn>
+                            <cn type="integer"> 1 </cn>
+                          </apply>
+                          <cn type="integer"> 1 </cn>
+                        </apply>
+                        <apply>
+                          <divide/>
+                          <ci> Hypo </ci>
+                          <apply>
+                            <plus/>
+                            <cn type="integer"> 1 </cn>
+                            <ci> Hypo </ci>
+                          </apply>
+                        </apply>
+                      </apply>
                       <cn> 0.5 </cn>
                     </apply>
                   </apply>
@@ -21594,7 +21622,27 @@
                       <ci> h </ci>
                       <apply>
                         <minus/>
-                        <cn type="integer"> 0 </cn>
+                        <apply>
+                          <times/>
+                          <apply>
+                            <divide/>
+                            <apply>
+                              <plus/>
+                              <cn type="integer"> 1 </cn>
+                              <cn type="integer"> 1 </cn>
+                            </apply>
+                            <cn type="integer"> 1 </cn>
+                          </apply>
+                          <apply>
+                            <divide/>
+                            <ci> Hypo </ci>
+                            <apply>
+                              <plus/>
+                              <cn type="integer"> 1 </cn>
+                              <ci> Hypo </ci>
+                            </apply>
+                          </apply>
+                        </apply>
                         <cn> 0.5 </cn>
                       </apply>
                     </apply>
@@ -21646,18 +21694,23 @@
                           <divide/>
                           <apply>
                             <plus/>
-                            <cn type="integer"> 1 </cn>
+                            <cn type="integer"> 2 </cn>
                             <cn type="integer"> 1 </cn>
                           </apply>
-                          <cn type="integer"> 1 </cn>
+                          <cn type="integer"> 2 </cn>
                         </apply>
                         <apply>
                           <divide/>
-                          <ci> ROS </ci>
+                          <apply>
+                            <plus/>
+                            <ci> ROS </ci>
+                            <ci> NutD </ci>
+                          </apply>
                           <apply>
                             <plus/>
                             <cn type="integer"> 1 </cn>
                             <ci> ROS </ci>
+                            <ci> NutD </ci>
                           </apply>
                         </apply>
                       </apply>
@@ -21700,18 +21753,23 @@
                             <divide/>
                             <apply>
                               <plus/>
-                              <cn type="integer"> 1 </cn>
+                              <cn type="integer"> 2 </cn>
                               <cn type="integer"> 1 </cn>
                             </apply>
-                            <cn type="integer"> 1 </cn>
+                            <cn type="integer"> 2 </cn>
                           </apply>
                           <apply>
                             <divide/>
-                            <ci> ROS </ci>
+                            <apply>
+                              <plus/>
+                              <ci> ROS </ci>
+                              <ci> NutD </ci>
+                            </apply>
                             <apply>
                               <plus/>
                               <cn type="integer"> 1 </cn>
                               <ci> ROS </ci>
+                              <ci> NutD </ci>
                             </apply>
                           </apply>
                         </apply>
