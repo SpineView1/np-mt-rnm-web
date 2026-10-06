@@ -3,12 +3,21 @@
   <model id="NP_MT_RNM" name="NP Mechanotransduction Regulatory Network Model" timeUnits="time_unit">
     <notes>
       <body xmlns="http://www.w3.org/1999/xhtml">
-        <h1>NP Mechanotransduction Regulatory Network Model</h1>
-        <p>147 nodes, 281 activation edges, 76 inhibition edges.</p>
-        <p>Mathematical framework: Mendoza/SQUADS ODE (Mendoza &amp; Xenarios 2006). Each non-stimulus species rate rule: dx/dt = sigmoid(omega; h) - gamma*x. Parameters: h=10.0, gamma=1.0, alpha=beta=1.</p>
-        <p>Boundary (clampable input) species: HL, NL, Hypo.</p>
-      </body>
-    </notes>
+        <h1>A systems-level network model reveals mechanical regulation of nucleus pulposus cell states.</h1>
+        <p>Zerihun G. Workineh, Francis Kiptengwer Chemorion, Jérôme Noailly</p>
+        <p>
+          <em>Barcelona Centre for New Medical Technologies (BCN MedTech), Department of Engineering, Universitat Pompeu Fabra, Barcelona, 08018, Spain</em>
+        </p>
+        <h2>Abstract</h2>
+        <p>Intervertebral disc degeneration (IDD) is a leading cause of chronic low back pain and is strongly influenced by mechanical loading–dependent regulation of nucleus pulposus (NP) cell phenotype. Although individual mechanosensors and signaling pathways have been characterized, the systems-level principles governing how NP cells integrate mechanical cues into coordinated regulatory states remain unclear. Here, we present a systems-level regulatory network model of NP mechanotransduction comprising 147 molecular nodes and 356 experimentally supported interactions spanning mechanosensory inputs, signaling cascades, metabolic and redox regulators, transcription factors, extracellular matrix (ECM) effectors, inflammatory mediators, and cell-fate modules. Mechanical environments are represented as hypo-, normal-, and hyper-loading inputs that initiate distinct signaling programs. Semi-quantitative regulatory network simulations reveal three stable regimes: a hypo-loading state characterized by reduced ECM-anabolic activity, impaired adhesion-mediated survival signaling, and metabolic stress with features consistent with an anoikis-like phenotype; a normal-loading state associated with coordinated ECM maintenance, metabolic balance, and redox stability; and a hyper-loading state dominated by inflammatory amplification, oxidative stress, matrix degradation, and apoptosis. Falsification tests against independent experimental data demonstrate high directional concordance (~95%), supporting the biological plausibility of the network. Systematic perturbation analysis further identifies a distributed control structure in which mechanotransductive, redox, and transcriptional regulators jointly determine state stability, with combined attenuation of mechanically driven and stress-amplifying pathways together with activation of anabolic or cytoprotective programs most effectively restoring normal-like states. These findings provide a systems-level framework for understanding load-dependent NP cell regulation and for guiding multi-target therapeutic strategies in intervertebral disc mechanobiology.</p>
+        <p>
+          <strong>Keywords:</strong> Nucleus pulposus, Mechanotransduction, Regulatory network modeling, Mechanical loading, Intervertebral disc degeneration, Systems biology, Network control</p>
+          <h2>NP Mechanotransduction Regulatory Network Model</h2>
+          <p>147 nodes, 281 activation edges, 76 inhibition edges.</p>
+          <p>Mathematical framework: Mendoza/SQUADS ODE (Mendoza &amp; Xenarios 2006). Each non-stimulus species rate rule: dx/dt = sigmoid(omega; h) - gamma*x. Parameters: h=10.0, gamma=1.0, alpha=beta=1.</p>
+          <p>Boundary (clampable input) species: HL, NL, Hypo.</p>
+        </body>
+      </notes>
     <listOfUnitDefinitions>
       <unitDefinition id="time_unit">
         <listOfUnits>

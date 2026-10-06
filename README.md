@@ -8,13 +8,23 @@ Paper: *A systems-level network model reveals mechanical regulation of nucleus p
 
 ---
 
+## Abstract
+
+Intervertebral disc degeneration (IDD) is a leading cause of chronic low back pain and is strongly influenced by mechanical loading–dependent regulation of nucleus pulposus (NP) cell phenotype. Although individual mechanosensors and signaling pathways have been characterized, the systems-level principles governing how NP cells integrate mechanical cues into coordinated regulatory states remain unclear. Here, we present a systems-level regulatory network model of NP mechanotransduction comprising 147 molecular nodes and 356 experimentally supported interactions spanning mechanosensory inputs, signaling cascades, metabolic and redox regulators, transcription factors, extracellular matrix (ECM) effectors, inflammatory mediators, and cell-fate modules. Mechanical environments are represented as hypo-, normal-, and hyper-loading inputs that initiate distinct signaling programs. Semi-quantitative regulatory network simulations reveal three stable regimes: a hypo-loading state characterized by reduced ECM-anabolic activity, impaired adhesion-mediated survival signaling, and metabolic stress with features consistent with an anoikis-like phenotype; a normal-loading state associated with coordinated ECM maintenance, metabolic balance, and redox stability; and a hyper-loading state dominated by inflammatory amplification, oxidative stress, matrix degradation, and apoptosis. Falsification tests against independent experimental data demonstrate high directional concordance (~95%), supporting the biological plausibility of the network. Systematic perturbation analysis further identifies a distributed control structure in which mechanotransductive, redox, and transcriptional regulators jointly determine state stability, with combined attenuation of mechanically driven and stress-amplifying pathways together with activation of anabolic or cytoprotective programs most effectively restoring normal-like states. These findings provide a systems-level framework for understanding load-dependent NP cell regulation and for guiding multi-target therapeutic strategies in intervertebral disc mechanobiology.
+
+**Keywords:** Nucleus pulposus, Mechanotransduction, Regulatory network modeling, Mechanical loading, Intervertebral disc degeneration, Systems biology, Network control
+
+---
+
 ## Features
 
 - Browse the SBML model: **147 species** spanning mechanical inputs, mechanosensors, signaling cascades, transcription factors, ECM, growth factors, cytokines, MMPs, and metabolic / hypoxia nodes.
 - Simulate from a basal **Normal-loading** anabolic steady state with [tellurium](https://tellurium.analogmachine.org/).
 - **Clamp any species** to a fixed value to impose mechanical regimes (e.g. `Hypo = 0.20` for hypo-loading, `HL = 0.80` for hyper-loading) or perturbations (`MMP13 = 1`, `SOX9 = 0`, …).
-- Bar plot of initial vs final activation across 31 paper-figure markers (ECM, mechanosensors, growth factors, hypoxia axis, inflammatory mediators, catabolic enzymes).
-- Download the live SBML.
+- **Abstract** tab: the manuscript's title, authors, abstract and keywords, verbatim.
+- **Paper results** tab: every computational figure of the manuscript (topology, baselines, transition heatmaps, falsification, rescue rankings and node-resolved responses), interactive, with the manuscript's figure numbers and captions and the manuscript-style image for each. Data come from [np-mt-rnm](https://github.com/SpineView1/np-mt-rnm)'s `results/web_bundle/paper_results.json`; images from its `results/figures/paper/`.
+- **Simulation** tab: run 100 replicates under the published loading regimes or your own clamps; results are added as series to the grouped panels, alongside the published Hypo / Normal / Hyper baselines.
+- Download the live SBML and simulation results (CSV).
 
 ## Requirements
 

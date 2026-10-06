@@ -47,6 +47,18 @@
     return s.replace(/↑/g, "").replace(/↓/g, "").replace(" + ", "-");
   }
 
+  var FIG_BASE = "";
+
+  /* Manuscript figure number + verbatim caption, and the manuscript-style image. */
+  function setFigure(d, slotId, key) {
+    var slot = document.getElementById(slotId);
+    var f = d.figures[key];
+    if (!slot || !f) return;
+    slot.innerHTML = '<p class="fig-caption"><b>' + f.number + ".</b> " + f.caption + "</p>" +
+      '<details class="mb-2"><summary>Manuscript figure (' + key + '.png)</summary>' +
+      '<img class="img-fluid border mt-2" loading="lazy" alt="' + f.number + '" src="' + FIG_BASE + key + '.png"></details>';
+  }
+
   var charts = {};
   function chart(id, cfg) {
     if (charts[id]) charts[id].destroy();
@@ -100,6 +112,7 @@
     });
     rankedBar("topo-bc", "B) Betweenness centrality", rows, "betweenness", "#4c72b0");
     rankedBar("topo-hc", "C) Harmonic closeness centrality", rows, "harmonic_closeness", "#8172b2");
+    setFigure(d, "slot-topology", "TOPO_STATS");
   }
 
   function renderBaseline(d) {
@@ -109,9 +122,9 @@
     d.baseline_figures.forEach(function (fig, fi) {
       var sec = document.createElement("div");
       sec.className = "mb-4";
-      sec.innerHTML = '<p class="small text-muted mb-1">' + fig.caption +
-        ' <span style="color:' + C.Hypo + '">■ Hypo</span> <span style="color:' + C.Normal +
-        '">■ Normal</span> <span style="color:' + C.Hyper + '">■ Hyper</span></p><div class="row g-3"></div>';
+      sec.innerHTML = '<p class="small mb-1"><span style="color:' + C.Hypo + '">■ Hypo</span> <span style="color:' + C.Normal +
+        '">■ Normal</span> <span style="color:' + C.Hyper + '">■ Hyper</span></p><div class="row g-3"></div>' +
+        '<div class="fig-slot mt-2" id="slot-' + fig.id + '"></div>';
       var row = sec.querySelector(".row");
       host.appendChild(sec);
       fig.panels.forEach(function (p, pi) {
@@ -134,6 +147,7 @@
           options: o
         });
       });
+      setFigure(d, "slot-" + fig.id, fig.id);
     });
   }
 
@@ -165,6 +179,7 @@
         function (i, j) { return means[nodes[i]][j]; },
         function (v) { return parula(v); }, g3);
     });
+    setFigure(d, "slot-transition", mod.tag + "_transition");
   }
 
   function renderRepresentative(d) {
@@ -191,6 +206,7 @@
         options: o
       });
     });
+    setFigure(d, "slot-representative", "Representative_transition_paths");
   }
 
   var thresholdLines = {
@@ -245,6 +261,7 @@
             backgroundColor: colors, borderColor: "#000", pointRadius: 5 }
         ] },
       options: f });
+    setFigure(d, "slot-falsification", "NP_MT_FALS");
   }
 
   function renderRescue(d, idx) {
@@ -300,6 +317,9 @@
       function (i, j) { return m.mean_delta[j][i]; },
       function (v) { return diverging(v, vmax); },
       function (v) { return Math.abs(v) < 0.005 ? "" : v.toFixed(2); });
+    setFigure(d, "slot-rescue", m.tag + "_rescue");
+    setFigure(d, "slot-rescue1", m.tag + "_rescue1");
+    document.getElementById("node-resolved-intro").textContent = d.node_resolved_intro;
   }
 
   function fillSelect(id, items, onChange) {
@@ -312,6 +332,7 @@
     var holder = document.getElementById("paper-data-url");
     if (!holder) return;
     var rendered = {};
+    FIG_BASE = holder.dataset.figures || "";
     fetch(holder.dataset.url).then(function (r) { return r.json(); }).then(function (d) {
       var renderers = {
         "#paper-topology": function () { renderTopology(d); },
