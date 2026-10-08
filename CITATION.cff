@@ -1,0 +1,35 @@
+cff-version: 1.2.0
+message: If you use this software, please cite both the paper and the repository.
+type: software
+title: "np-mt-rnm-web: Interactive web application for the nucleus pulposus mechanotransduction regulatory network model"
+license: MIT
+repository-code: "https://github.com/SpineView1/np-mt-rnm-web"
+authors:
+  - family-names: Workineh
+    given-names: Zerihun G.
+    email: zerihungetahun.workineh@upf.edu
+    affiliation: Universitat Pompeu Fabra, BCN MedTech
+  - family-names: Chemorion
+    given-names: Francis Kiptengwer
+    email: francis.chemorion@upf.edu
+    affiliation: Universitat Pompeu Fabra, BCN MedTech
+  - family-names: Noailly
+    given-names: Jérôme
+    affiliation: Universitat Pompeu Fabra, BCN MedTech
+identifiers:
+  - type: doi
+    value: 10.5281/zenodo.23204747
+    description: Concept DOI (all versions)
+preferred-citation:
+  type: article
+  authors:
+    - family-names: Workineh
+      given-names: Zerihun G.
+    - family-names: Chemorion
+      given-names: Francis Kiptengwer
+    - family-names: Noailly
+      given-names: Jérôme
+  title: >-
+    A systems-level network model reveals mechanical regulation of nucleus
+    pulposus cell states
+  year: 2026
