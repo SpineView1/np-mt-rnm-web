@@ -9,11 +9,11 @@
           <em>Barcelona Centre for New Medical Technologies (BCN MedTech), Department of Engineering, Universitat Pompeu Fabra, Barcelona, 08018, Spain</em>
         </p>
         <h2>Abstract</h2>
-        <p>Intervertebral disc degeneration (IDD) is a leading cause of chronic low back pain and is strongly influenced by mechanical loading–dependent regulation of nucleus pulposus (NP) cell phenotype. Although individual mechanosensors and signaling pathways have been characterized, the systems-level principles governing how NP cells integrate mechanical cues into coordinated regulatory states remain unclear. Here, we present a systems-level regulatory network model of NP mechanotransduction comprising 147 molecular nodes and 356 experimentally supported interactions spanning mechanosensory inputs, signaling cascades, metabolic and redox regulators, transcription factors, extracellular matrix (ECM) effectors, inflammatory mediators, and cell-fate modules. Mechanical environments are represented as hypo-, normal-, and hyper-loading inputs that initiate distinct signaling programs. Semi-quantitative regulatory network simulations reveal three stable regimes: a hypo-loading state characterized by reduced ECM-anabolic activity, impaired adhesion-mediated survival signaling, and metabolic stress with features consistent with an anoikis-like phenotype; a normal-loading state associated with coordinated ECM maintenance, metabolic balance, and redox stability; and a hyper-loading state dominated by inflammatory amplification, oxidative stress, matrix degradation, and apoptosis. Falsification tests against independent experimental data demonstrate high directional concordance (~95%), supporting the biological plausibility of the network. Systematic perturbation analysis further identifies a distributed control structure in which mechanotransductive, redox, and transcriptional regulators jointly determine state stability, with combined attenuation of mechanically driven and stress-amplifying pathways together with activation of anabolic or cytoprotective programs most effectively restoring normal-like states. These findings provide a systems-level framework for understanding load-dependent NP cell regulation and for guiding multi-target therapeutic strategies in intervertebral disc mechanobiology.</p>
+        <p>Intervertebral disc degeneration (IDD) is a leading cause of chronic low back pain and is strongly influenced by mechanical loading–dependent regulation of nucleus pulposus (NP) cell phenotype. Although individual mechanosensors and signaling pathways have been characterized, the systems-level principles governing how NP cells integrate mechanical cues into coordinated regulatory states remain unclear. Here, we present a systems-level regulatory network model of NP mechanotransduction comprising 146 molecular nodes and 353 experimentally supported interactions spanning mechanosensory inputs, signaling cascades, metabolic and redox regulators, transcription factors, extracellular matrix (ECM) effectors, inflammatory mediators, and cell-fate modules. Mechanical environments are represented as hypo-, normal-, and hyper-loading inputs that initiate distinct signaling programs. Semi-quantitative regulatory network simulations reveal three stable regimes: a hypo-loading state characterized by reduced ECM-anabolic activity, impaired adhesion-mediated survival signaling, and metabolic stress with features consistent with an anoikis-like phenotype; a normal-loading state associated with coordinated ECM maintenance, metabolic balance, and redox stability; and a hyper-loading state dominated by inflammatory amplification, oxidative stress, matrix degradation, and apoptosis. Falsification tests against independent experimental data demonstrate high directional concordance (∼95%), supporting the biological plausibility of the network. Systematic perturbation analysis further identifies a distributed control structure in which mechanotransductive, redox, and transcriptional regulators jointly determine state stability, with combined attenuation of mechanically driven and stress-amplifying pathways together with activation of anabolic or cytoprotective programs most effectively restoring normal-like states. These findings provide a systems-level framework for understanding load-dependent NP cell regulation and for guiding multi-target therapeutic strategies in intervertebral disc mechanobiology.</p>
         <p>
           <strong>Keywords:</strong> Nucleus pulposus, Mechanotransduction, Regulatory network modeling, Mechanical loading, Intervertebral disc degeneration, Systems biology, Network control</p>
           <h2>NP Mechanotransduction Regulatory Network Model</h2>
-          <p>147 nodes, 281 activation edges, 76 inhibition edges.</p>
+          <p>146 nodes, 277 activation edges, 76 inhibition edges.</p>
           <p>Mathematical framework: Mendoza/SQUADS ODE (Mendoza &amp; Xenarios 2006). Each non-stimulus species rate rule: dx/dt = sigmoid(omega; h) - gamma*x. Parameters: h=10.0, gamma=1.0, alpha=beta=1.</p>
           <p>Boundary (clampable input) species: HL, NL, Hypo.</p>
         </body>
@@ -179,7 +179,6 @@
       <species id="SDC4_M" name="SDC4-M" compartment="cell" initialConcentration="0.5" substanceUnits="arbitrary_units" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
       <species id="SDC4_E" name="SDC4-E" compartment="cell" initialConcentration="0.5" substanceUnits="arbitrary_units" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
       <species id="Hypo" name="Hypo" compartment="cell" initialConcentration="0.5" substanceUnits="arbitrary_units" hasOnlySubstanceUnits="false" boundaryCondition="true" constant="false"/>
-      <species id="NutD" name="NutD" compartment="cell" initialConcentration="0.5" substanceUnits="arbitrary_units" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
       <species id="MitD" name="MitD" compartment="cell" initialConcentration="0.5" substanceUnits="arbitrary_units" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
     </listOfSpecies>
     <listOfParameters>
@@ -7237,10 +7236,10 @@
                           <divide/>
                           <apply>
                             <plus/>
-                            <cn type="integer"> 5 </cn>
+                            <cn type="integer"> 4 </cn>
                             <cn type="integer"> 1 </cn>
                           </apply>
-                          <cn type="integer"> 5 </cn>
+                          <cn type="integer"> 4 </cn>
                         </apply>
                         <apply>
                           <divide/>
@@ -7250,7 +7249,6 @@
                             <ci> JNK </ci>
                             <ci> mTORC1 </ci>
                             <ci> P38 </ci>
-                            <ci> NutD </ci>
                           </apply>
                           <apply>
                             <plus/>
@@ -7259,7 +7257,6 @@
                             <ci> JNK </ci>
                             <ci> mTORC1 </ci>
                             <ci> P38 </ci>
-                            <ci> NutD </ci>
                           </apply>
                         </apply>
                         <apply>
@@ -7327,10 +7324,10 @@
                             <divide/>
                             <apply>
                               <plus/>
-                              <cn type="integer"> 5 </cn>
+                              <cn type="integer"> 4 </cn>
                               <cn type="integer"> 1 </cn>
                             </apply>
-                            <cn type="integer"> 5 </cn>
+                            <cn type="integer"> 4 </cn>
                           </apply>
                           <apply>
                             <divide/>
@@ -7340,7 +7337,6 @@
                               <ci> JNK </ci>
                               <ci> mTORC1 </ci>
                               <ci> P38 </ci>
-                              <ci> NutD </ci>
                             </apply>
                             <apply>
                               <plus/>
@@ -7349,7 +7345,6 @@
                               <ci> JNK </ci>
                               <ci> mTORC1 </ci>
                               <ci> P38 </ci>
-                              <ci> NutD </ci>
                             </apply>
                           </apply>
                           <apply>
@@ -16627,10 +16622,10 @@
                           <divide/>
                           <apply>
                             <plus/>
-                            <cn type="integer"> 4 </cn>
+                            <cn type="integer"> 3 </cn>
                             <cn type="integer"> 1 </cn>
                           </apply>
-                          <cn type="integer"> 4 </cn>
+                          <cn type="integer"> 3 </cn>
                         </apply>
                         <apply>
                           <divide/>
@@ -16639,7 +16634,6 @@
                             <ci> Ca2plussu </ci>
                             <ci> DRP1 </ci>
                             <ci> ROCK_E </ci>
-                            <ci> NutD </ci>
                           </apply>
                           <apply>
                             <plus/>
@@ -16647,7 +16641,6 @@
                             <ci> Ca2plussu </ci>
                             <ci> DRP1 </ci>
                             <ci> ROCK_E </ci>
-                            <ci> NutD </ci>
                           </apply>
                         </apply>
                         <apply>
@@ -16715,10 +16708,10 @@
                             <divide/>
                             <apply>
                               <plus/>
-                              <cn type="integer"> 4 </cn>
+                              <cn type="integer"> 3 </cn>
                               <cn type="integer"> 1 </cn>
                             </apply>
-                            <cn type="integer"> 4 </cn>
+                            <cn type="integer"> 3 </cn>
                           </apply>
                           <apply>
                             <divide/>
@@ -16727,7 +16720,6 @@
                               <ci> Ca2plussu </ci>
                               <ci> DRP1 </ci>
                               <ci> ROCK_E </ci>
-                              <ci> NutD </ci>
                             </apply>
                             <apply>
                               <plus/>
@@ -16735,7 +16727,6 @@
                               <ci> Ca2plussu </ci>
                               <ci> DRP1 </ci>
                               <ci> ROCK_E </ci>
-                              <ci> NutD </ci>
                             </apply>
                           </apply>
                           <apply>
@@ -21547,7 +21538,7 @@
           </apply>
         </math>
       </rateRule>
-      <rateRule variable="NutD">
+      <rateRule variable="MitD">
         <math xmlns="http://www.w3.org/1998/Math/MathML">
           <apply>
             <minus/>
@@ -21590,11 +21581,11 @@
                         </apply>
                         <apply>
                           <divide/>
-                          <ci> Hypo </ci>
+                          <ci> ROS </ci>
                           <apply>
                             <plus/>
                             <cn type="integer"> 1 </cn>
-                            <ci> Hypo </ci>
+                            <ci> ROS </ci>
                           </apply>
                         </apply>
                       </apply>
@@ -21644,141 +21635,11 @@
                           </apply>
                           <apply>
                             <divide/>
-                            <ci> Hypo </ci>
-                            <apply>
-                              <plus/>
-                              <cn type="integer"> 1 </cn>
-                              <ci> Hypo </ci>
-                            </apply>
-                          </apply>
-                        </apply>
-                        <cn> 0.5 </cn>
-                      </apply>
-                    </apply>
-                  </apply>
-                </apply>
-              </apply>
-            </apply>
-            <apply>
-              <times/>
-              <ci> gamma </ci>
-              <ci> NutD </ci>
-            </apply>
-          </apply>
-        </math>
-      </rateRule>
-      <rateRule variable="MitD">
-        <math xmlns="http://www.w3.org/1998/Math/MathML">
-          <apply>
-            <minus/>
-            <apply>
-              <divide/>
-              <apply>
-                <plus/>
-                <apply>
-                  <minus/>
-                  <apply>
-                    <exp/>
-                    <apply>
-                      <times/>
-                      <cn> 0.5 </cn>
-                      <ci> h </ci>
-                    </apply>
-                  </apply>
-                </apply>
-                <apply>
-                  <exp/>
-                  <apply>
-                    <times/>
-                    <apply>
-                      <minus/>
-                      <cn type="integer"> 1 </cn>
-                    </apply>
-                    <ci> h </ci>
-                    <apply>
-                      <minus/>
-                      <apply>
-                        <times/>
-                        <apply>
-                          <divide/>
-                          <apply>
-                            <plus/>
-                            <cn type="integer"> 2 </cn>
-                            <cn type="integer"> 1 </cn>
-                          </apply>
-                          <cn type="integer"> 2 </cn>
-                        </apply>
-                        <apply>
-                          <divide/>
-                          <apply>
-                            <plus/>
                             <ci> ROS </ci>
-                            <ci> NutD </ci>
-                          </apply>
-                          <apply>
-                            <plus/>
-                            <cn type="integer"> 1 </cn>
-                            <ci> ROS </ci>
-                            <ci> NutD </ci>
-                          </apply>
-                        </apply>
-                      </apply>
-                      <cn> 0.5 </cn>
-                    </apply>
-                  </apply>
-                </apply>
-              </apply>
-              <apply>
-                <times/>
-                <apply>
-                  <minus/>
-                  <cn type="integer"> 1 </cn>
-                  <apply>
-                    <exp/>
-                    <apply>
-                      <times/>
-                      <cn> 0.5 </cn>
-                      <ci> h </ci>
-                    </apply>
-                  </apply>
-                </apply>
-                <apply>
-                  <plus/>
-                  <cn type="integer"> 1 </cn>
-                  <apply>
-                    <exp/>
-                    <apply>
-                      <times/>
-                      <apply>
-                        <minus/>
-                        <cn type="integer"> 1 </cn>
-                      </apply>
-                      <ci> h </ci>
-                      <apply>
-                        <minus/>
-                        <apply>
-                          <times/>
-                          <apply>
-                            <divide/>
-                            <apply>
-                              <plus/>
-                              <cn type="integer"> 2 </cn>
-                              <cn type="integer"> 1 </cn>
-                            </apply>
-                            <cn type="integer"> 2 </cn>
-                          </apply>
-                          <apply>
-                            <divide/>
-                            <apply>
-                              <plus/>
-                              <ci> ROS </ci>
-                              <ci> NutD </ci>
-                            </apply>
                             <apply>
                               <plus/>
                               <cn type="integer"> 1 </cn>
                               <ci> ROS </ci>
-                              <ci> NutD </ci>
                             </apply>
                           </apply>
                         </apply>

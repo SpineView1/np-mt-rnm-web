@@ -47,7 +47,7 @@ FIXED_ORDER = [
     # Metabolic & related
     'LKB1', 'NADplus', 'AMPK', 'mTORC1', 'mTORC2', 'SIRT1', 'PI3K_M', 'PI3K_E', 'PIP3_M', 
     'PIP3_E', 'PDK1_M', 'PDK1_E', 'AKT1_M', 'AKT1_E', 'GSK3B', 'ULK1', 'PTEN', 'PLD2', 'PGE2', 
-    'COX_2', 'CAT', 'GPX1', 'SOD1', 'SOD2', 'HO_1', 'PHD2', 'VHL', 'Rheb', 'NutD', 'MitD', 
+    'COX_2', 'CAT', 'GPX1', 'SOD1', 'SOD2', 'HO_1', 'PHD2', 'VHL', 'Rheb', 'MitD', 
     # Oxidative-stress defense & proteostasis
     'HSP70', 'HSP27', 'ROS', 
     # Transcription factors
@@ -423,7 +423,6 @@ class RunSimulation(APIView):
         'NF_kappaB': 2.984488536264584e-08,
         'NL': 0.8,
         'NRF2': 7.130405483235003e-05,
-        'NutD': 0.0014734271172591848,
         'P38': 4.8796338732475356e-05,
         'PAK1': 0.9864531741122851,
         'PDK1_E': 1.6551369926772148e-08,
@@ -589,12 +588,12 @@ class RunSimulation(APIView):
             }, status=500)
 
     def _generate_bar_plot(self, species_names, concentrations, initial_concentrations):
-        # Wide canvas so 147 species' Initial/Final bar pairs each get enough
+        # Wide canvas so all species' Initial/Final bar pairs each get enough
         # horizontal pixels (~ 0.3 in per species) to render thick, readable bars.
         species = FIXED_ORDER
         n = len(species)
         per_species_inches = 0.3
-        fig_w = max(20.0, n * per_species_inches)  # ~44 in for 147 species
+        fig_w = max(20.0, n * per_species_inches)  # ~44 in for 146 species
         plt.figure(figsize=(fig_w, 10))
 
         initial_values = [initial_concentrations.get(s, 0) for s in species]
