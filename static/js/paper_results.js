@@ -7,20 +7,7 @@
 
   var C = { Hypo: "#0000ff", Normal: "#009900", Hyper: "#ff0000" };
   var GREEN = "#2ca02c", RED = "#d62728", BLUE = "rgb(31,102,184)", DARKRED = "rgb(199,51,51)";
-  var KD = ["RhoA-E", "PIEZO1", "PI3K-E", "FAK-E", "ROS"];
-
-  // MATLAB parula anchors.
-  var PARULA = [
-    [0.2422, 0.1504, 0.6603], [0.2810, 0.3228, 0.9579], [0.1786, 0.5289, 0.9682],
-    [0.0689, 0.6948, 0.8394], [0.2161, 0.7843, 0.5923], [0.6720, 0.7793, 0.2227],
-    [0.9970, 0.7659, 0.2199], [0.9657, 0.9494, 0.1734], [0.9769, 0.9839, 0.0805]
-  ];
-
-  function parula(t) {
-    t = Math.max(0, Math.min(1, t)) * (PARULA.length - 1);
-    var i = Math.min(Math.floor(t), PARULA.length - 2), f = t - i;
-    return PARULA[i].map(function (a, k) { return a + f * (PARULA[i + 1][k] - a); });
-  }
+  var FGREEN = "rgb(0,176,36)", FRED = "rgb(235,19,24)", FGRAY = "rgb(199,204,209)";
 
   function diverging(v, vmax) {
     // blue (−) → white → red (+)
@@ -31,32 +18,63 @@
   function rgb(c) { return "rgb(" + c.map(function (x) { return Math.round(x * 255); }).join(",") + ")"; }
   function luminance(c) { return 0.299 * c[0] + 0.587 * c[1] + 0.114 * c[2]; }
 
-  // MATLAB %.3g.
-  function g3(v) {
-    if (v === 0) return "0";
-    var a = Math.abs(v);
-    if (a < 1e-4 || a >= 1e3) {
-      var s = v.toExponential(2).replace(/\.?0+e/, "e");
-      return s.replace(/e([+-])(\d)$/, "e$10$2");
-    }
-    return String(parseFloat(v.toPrecision(3)));
-  }
-
-  // 'SOX9↑ + FAK-E↓' -> 'SOX9-FAK-E', as RESCUE_NEW4_1_final.m labels them.
+  // 'SOX9↑ + ROS↓' -> 'SOX9-ROS', as RESCUE_NEW4_1_48_targets_HQ.m labels them
+  // (labels in the bundle are already in this form).
   function shortLabel(s) {
     return s.replace(/↑/g, "").replace(/↓/g, "").replace(" + ", "-");
   }
 
+  function esc(s) {
+    return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; });
+  }
+
+  /* Error-bar plugin: dataset.errLow / dataset.errHigh hold absolute bounds
+     for each data point (asymmetric CIs or mean ± SD). */
+  var errorBars = {
+    id: "errorBars",
+    afterDatasetsDraw: function (c) {
+      var ctx = c.ctx, horizontal = c.options.indexAxis === "y";
+      c.data.datasets.forEach(function (ds, di) {
+        if (!ds.errLow || !ds.errHigh) return;
+        var meta = c.getDatasetMeta(di);
+        if (meta.hidden) return;
+        var vScale = horizontal ? c.scales.x : c.scales.y;
+        ctx.save();
+        ctx.strokeStyle = ds.errColor || "#1a1a1a"; ctx.lineWidth = ds.errWidth || 1;
+        meta.data.forEach(function (el, i) {
+          var lo = ds.errLow[i], hi = ds.errHigh[i];
+          if (lo == null || hi == null) return;
+          var a = vScale.getPixelForValue(lo), b = vScale.getPixelForValue(hi), cap = ds.errCap || 3;
+          ctx.beginPath();
+          if (horizontal) {
+            ctx.moveTo(a, el.y); ctx.lineTo(b, el.y);
+            ctx.moveTo(a, el.y - cap); ctx.lineTo(a, el.y + cap);
+            ctx.moveTo(b, el.y - cap); ctx.lineTo(b, el.y + cap);
+          } else {
+            ctx.moveTo(el.x, a); ctx.lineTo(el.x, b);
+            ctx.moveTo(el.x - cap, a); ctx.lineTo(el.x + cap, a);
+            ctx.moveTo(el.x - cap, b); ctx.lineTo(el.x + cap, b);
+          }
+          ctx.stroke();
+        });
+        ctx.restore();
+      });
+    }
+  };
+
   var FIG_BASE = "";
 
   /* Manuscript figure number + verbatim caption, and the manuscript-style image. */
-  function setFigure(d, slotId, key) {
+  function setFigure(d, slotId, keys) {
+    keys = [].concat(keys);
     var slot = document.getElementById(slotId);
-    var f = d.figures[key];
+    var f = d.figures[keys[0]];
     if (!slot || !f) return;
     slot.innerHTML = '<p class="fig-caption"><b>' + f.number + ".</b> " + f.caption + "</p>" +
-      '<details class="mb-2"><summary>Manuscript figure (' + key + '.png)</summary>' +
-      '<img class="img-fluid border mt-2" loading="lazy" alt="' + f.number + '" src="' + FIG_BASE + key + '.png"></details>';
+      '<details class="mb-2"><summary>Manuscript figure (' + keys.map(function (k) { return k + ".png"; }).join(", ") +
+      ')</summary>' + keys.map(function (k) {
+        return '<img class="img-fluid border mt-2" loading="lazy" alt="' + f.number + '" src="' + FIG_BASE + k + '.png">';
+      }).join("") + "</details>";
   }
 
   var charts = {};
@@ -116,6 +134,7 @@
   }
 
   function renderBaseline(d) {
+    document.getElementById("baseline-note").textContent = d.baseline_note || "";
     var host = document.getElementById("paper-baseline-figs");
     host.innerHTML = "";
     var letters = "ABCD";
@@ -136,12 +155,21 @@
         var o = baseOpts(letters[pi] + ") " + p.title);
         o.scales = { y: { min: 0, max: 1, title: { display: true, text: "Activation (a.u.)" } },
                      x: { ticks: { autoSkip: false, maxRotation: 60, minRotation: 45 } } };
+        o.plugins.tooltip = { callbacks: { label: function (ctx) {
+          var reg = ctx.dataset.label, i = ctx.dataIndex;
+          var t = reg + ": " + ctx.parsed.y.toFixed(3) + " (95% CI " + p.ci_low[reg][i].toFixed(3) + "–" +
+            p.ci_high[reg][i].toFixed(3) + "; SD " + p.sd[reg][i].toFixed(3) + ")";
+          if (reg === "Hyper" && p.q_nl_hl[i] != null) t += "; NL–HL q = " + p.q_nl_hl[i].toExponential(2);
+          return t;
+        } } };
         chart(id, {
           type: "bar",
+          plugins: [errorBars],
           data: {
             labels: p.nodes,
             datasets: ["Hypo", "Normal", "Hyper"].map(function (reg) {
-              return { label: reg, data: p.series[reg], backgroundColor: C[reg] };
+              return { label: reg, data: p.series[reg], backgroundColor: C[reg],
+                       errLow: p.ci_low[reg], errHigh: p.ci_high[reg], errCap: 2 };
             })
           },
           options: o
@@ -167,48 +195,6 @@
     document.getElementById(hostId).innerHTML = html;
   }
 
-  function renderTransitions(d, moduleIdx) {
-    var mod = d.transition_modules[moduleIdx];
-    document.querySelectorAll(".trans-title").forEach(function (el) { el.textContent = mod.title; });
-    // Rows bottom-to-top as in the MATLAB heatmaps (first node at the bottom).
-    var nodes = mod.nodes.slice().reverse();
-    var steps = ["1", "2", "3", "4", "5", "6"];
-    [["hypo_to_normal", "trans-heat-h2n"], ["normal_to_hyper", "trans-heat-n2h"]].forEach(function (pair) {
-      var means = d.transitions[pair[0]].means;
-      heatTable(pair[1], nodes, steps,
-        function (i, j) { return means[nodes[i]][j]; },
-        function (v) { return parula(v); }, g3);
-    });
-    setFigure(d, "slot-transition", mod.tag + "_transition");
-  }
-
-  function renderRepresentative(d) {
-    var palette = { COL2A1: "#0072bd", ACAN: "#77ac30", TIMP3: "#edb120", COL1A1: "#0072bd",
-      COL10A1: "#77ac30", SOX9: "#000000", "NF-κB": "#edb120", ROS: "#000000", IGF1: "#ff00ff",
-      VEGF: "#ff00ff", Bcl2: "#4dbeee", CASP3: "#4dbeee" };
-    var anab = d.representative.anabolic;
-    [["hypo_to_normal", "rep-h2n", "A) Hypo to Normal transition path"],
-     ["normal_to_hyper", "rep-n2h", "B) Normal to Hyper transition path"]].forEach(function (t) {
-      var means = d.transitions[t[0]].means;
-      var o = baseOpts(t[2]);
-      o.plugins.legend = { display: true, position: "right", labels: { boxWidth: 24 } };
-      o.scales = { y: { min: 0, max: 1, title: { display: true, text: "Steady-state activation" } },
-                   x: { title: { display: true, text: "Path step" } } };
-      chart(t[1], {
-        type: "line",
-        data: {
-          labels: [1, 2, 3, 4, 5, 6],
-          datasets: d.representative.nodes.map(function (n) {
-            return { label: n, data: means[n], borderColor: palette[n] || "#333", backgroundColor: palette[n] || "#333",
-              borderWidth: 2.5, pointRadius: 0, tension: 0, borderDash: anab.indexOf(n) >= 0 ? [] : [6, 4] };
-          })
-        },
-        options: o
-      });
-    });
-    setFigure(d, "slot-representative", "Representative_transition_paths");
-  }
-
   var thresholdLines = {
     id: "thresholdLines",
     afterDraw: function (c, _, opts) {
@@ -218,7 +204,7 @@
         var scale = c.scales[opts.axis];
         var p = scale.getPixelForValue(l.value);
         ctx.save();
-        ctx.strokeStyle = l.color; ctx.setLineDash([3, 3]); ctx.lineWidth = 1.5;
+        ctx.strokeStyle = l.color; ctx.setLineDash(l.solid ? [] : [3, 3]); ctx.lineWidth = 1.5;
         ctx.beginPath();
         if (opts.axis === "y") { ctx.moveTo(area.left, p); ctx.lineTo(area.right, p); }
         else { ctx.moveTo(p, area.top); ctx.lineTo(p, area.bottom); }
@@ -228,46 +214,88 @@
   };
 
   function renderFalsification(d) {
-    var rules = d.falsification.rules.slice().sort(function (a, b) { return b.delta - a.delta; });
-    var passed = rules.filter(function (r) { return r.passed; }).length;
-    var failed = rules.filter(function (r) { return !r.passed; }).map(function (r) { return r.node; });
+    var F = d.falsification;
+    var rules = F.rules.slice().sort(function (a, b) { return b.delta - a.delta; });
+    var bad = rules.filter(function (r) { return r.outcome !== "Concordant"; });
     document.getElementById("fals-score").textContent =
-      passed + " / " + rules.length + " rules satisfied" + (failed.length ? " (fail: " + failed.join(", ") + ")" : "");
-    // As in NP_MT_FALS.png: colour by marker class (anabolic green, catabolic
-    // red), so a failing rule shows as a red bar on the positive side.
-    var colors = rules.map(function (r) { return r["class"] === "anabolic" ? GREEN : RED; });
-    var o = baseOpts("A) Directional effects by node (Normal − Hyper)");
-    o.scales = { y: { min: -1, max: 1, title: { display: true, text: "Δ (Normal − Hyper)" } },
-                 x: { ticks: { autoSkip: false, maxRotation: 70, minRotation: 60 } } };
-    o.plugins.thresholdLines = { axis: "y", lines: [{ value: 0.02, color: GREEN }, { value: -0.02, color: RED }] };
-    chart("fals-bars", { type: "bar", plugins: [thresholdLines],
-      data: { labels: rules.map(function (r) { return r.node; }), datasets: [{ data: rules.map(function (r) { return r.delta; }), backgroundColor: colors }] },
-      options: o });
+      F.counts.Concordant + " / " + rules.length + " concordant (" +
+      (100 * F.counts.Concordant / rules.length).toFixed(1) + "%)" +
+      (bad.length ? " · " + bad.map(function (r) { return r.node + " " + r.outcome.toLowerCase(); }).join(", ") : "") +
+      " · indeterminate " + F.counts.Indeterminate;
+    document.getElementById("fals-summary").textContent = d.falsification_summary || "";
+    var labels = rules.map(function (r) { return r.node; });
 
-    var f = baseOpts("B) Falsification forest plot (Normal − Hyper, 95% CI)");
-    f.indexAxis = "y";
-    f.scales = { x: { min: -1.05, max: 1.05, title: { display: true, text: "Mean difference (Normal − Hyper)" } },
-                 y: { ticks: { autoSkip: false } } };
-    f.plugins.thresholdLines = { axis: "x", lines: [{ value: 0.02, color: GREEN }, { value: -0.02, color: RED }] };
+    // (A) NL / HL mean activation with 95% CIs, as Figure_A_NL_HL_Parallel_v12.
+    var o = baseOpts("(A) Mean steady-state activation, NL and HL (95% CI of the mean)");
+    o.indexAxis = "y";
+    o.plugins.legend = { display: true, position: "top" };
+    o.scales = { x: { min: 0, max: 1, title: { display: true, text: "Mean steady-state activation (0–1)" } },
+                 y: { ticks: { autoSkip: false, font: { size: 11 } } } };
+    chart("fals-profiles", { type: "bar", plugins: [errorBars],
+      data: { labels: labels, datasets: [
+        { label: "NL", data: rules.map(function (r) { return r.mean_normal; }), backgroundColor: FGREEN,
+          errLow: rules.map(function (r) { return r.nl_ci[0]; }), errHigh: rules.map(function (r) { return r.nl_ci[1]; }),
+          errColor: "rgb(0,87,15)", errCap: 2 },
+        { label: "HL", data: rules.map(function (r) { return r.mean_hyper; }), backgroundColor: FRED,
+          errLow: rules.map(function (r) { return r.hl_ci[0]; }), errHigh: rules.map(function (r) { return r.hl_ci[1]; }),
+          errColor: "rgb(148,0,10)", errCap: 2 }
+      ] }, options: o });
+
+    // (B) sign grid: upper-left = simulation, lower-right = literature.
+    function col(dir, code) {
+      if (dir === 0) return FGRAY;
+      return (dir === 1 && code === "NL") || (dir === -1 && code === "HL") ? FGREEN : FRED;
+    }
+    function tri(sim, exp) {
+      return '<td class="tri" style="background:linear-gradient(to bottom right,' + sim + " 0 50%," + exp + ' 50% 100%)"></td>';
+    }
+    var html = '<table><thead><tr><th></th><th>NL</th><th>HL</th></tr></thead><tbody>';
+    rules.forEach(function (r) {
+      var exp = r.literature_direction === "+" ? 1 : -1;
+      var sim = r.ci_lower > 0 ? 1 : (r.ci_upper < 0 ? -1 : 0);
+      html += "<tr><th>" + esc(r.node) + "</th>" + tri(col(sim, "NL"), col(exp, "NL")) + tri(col(sim, "HL"), col(exp, "HL")) + "</tr>";
+    });
+    document.getElementById("fals-signs").innerHTML = html + "</tbody></table>" +
+      '<p class="small mt-2 mb-0"><b>Supported:</b> ' + F.counts.Concordant + " · <b>Contradicted:</b> " +
+      F.counts.Contradictory + " · <b>Inconclusive:</b> " + F.counts.Indeterminate + "</p>";
+
+    // (C) forest plot: tested nodes on x, vertical CIs, squares = contradictory.
+    var colors = rules.map(function (r) { return r["class"] === "anabolic" ? GREEN : RED; });
+    var f = baseOpts("(C) Falsification forest plot (Normal − Hyper, 95% CI)");
+    f.scales = { y: { min: -1.02, max: 1.02, title: { display: true, text: "Mean difference (Normal − Hyper)" } },
+                 x: { type: "category", labels: labels, ticks: { autoSkip: false, maxRotation: 90, minRotation: 90 },
+                      title: { display: true, text: "Tested nodes" } } };
+    f.plugins.thresholdLines = { axis: "y", lines: [{ value: 0, color: "#000", solid: true }] };
     f.plugins.tooltip = { callbacks: { label: function (ctx) {
       var r = rules[ctx.dataIndex];
-      return "Δ = " + r.delta.toFixed(3) + ", CI [" + r.ci_lower.toFixed(3) + ", " + r.ci_upper.toFixed(3) + "]";
+      return r.node + ": Δ = " + r.delta.toFixed(4) + ", CI [" + r.ci_lower.toFixed(4) + ", " + r.ci_upper.toFixed(4) + "] — " + r.outcome;
     } } };
-    chart("fals-forest", { type: "bar", plugins: [thresholdLines],
-      data: { labels: rules.map(function (r) { return r.node; }),
-        datasets: [
-          { type: "bar", data: rules.map(function (r) { return [r.ci_lower, r.ci_upper]; }), backgroundColor: "#999", barThickness: 3 },
-          { type: "scatter", data: rules.map(function (r, i) { return { x: r.delta, y: r.node }; }),
-            backgroundColor: colors, borderColor: "#000", pointRadius: 5 }
-        ] },
+    chart("fals-forest", { type: "scatter", plugins: [thresholdLines, errorBars],
+      data: { datasets: [{ data: rules.map(function (r) { return { x: r.node, y: r.delta }; }),
+        backgroundColor: colors, borderColor: "#000", borderWidth: 1.2,
+        pointStyle: rules.map(function (r) { return r.outcome === "Contradictory" ? "rect" : "circle"; }),
+        pointRadius: 6, errLow: rules.map(function (r) { return r.ci_lower; }),
+        errHigh: rules.map(function (r) { return r.ci_upper; }), errColor: "#8c8c8c", errWidth: 1.5 }] },
       options: f });
-    setFigure(d, "slot-falsification", "NP_MT_FALS");
+    setFigure(d, "slot-falsification", ["NP_MT_FALS_RECT", "NP_MT_FALS"]);
+
+    // Registry table.
+    var t = '<thead><tr><th>Node</th><th>Lit. dir.</th><th>Benchmarks</th><th>Mean NL</th><th>Mean HL</th>' +
+      "<th>Δ</th><th>95% bootstrap CI</th><th>Outcome</th><th>References</th></tr></thead><tbody>";
+    F.rules.forEach(function (r) {
+      t += "<tr><td>" + esc(r.node) + "</td><td>" + (r.literature_direction === "+" ? "+" : "−") + "</td><td>" +
+        esc(r.benchmark_ids.join(", ")) + "</td><td>" + r.mean_normal.toFixed(5) + "</td><td>" + r.mean_hyper.toFixed(5) +
+        "</td><td>" + (r.delta >= 0 ? "+" : "") + r.delta.toFixed(5) + "</td><td>[" + r.ci_lower.toFixed(5) + ", " +
+        r.ci_upper.toFixed(5) + "]</td><td>" + (r.passed ? r.outcome : "<b>" + r.outcome + "</b>") + "</td><td>" +
+        esc(r.references.join("; ")) + "</td></tr>";
+    });
+    document.getElementById("fals-table").innerHTML = t + "</tbody>";
   }
 
   function renderRescue(d, idx) {
     var m = d.rescue[idx];
     var top = m.top20;
-    var o = baseOpts(["Top 20 Rescue Strategies — " + m.title, "Hyper → Normal Profile Restoration"]);
+    var o = baseOpts([m.figure + " (" + m.panel + ") · Top 20 Rescue Strategies — " + m.title, "Hyper → Normal Profile Restoration"]);
     o.indexAxis = "y";
     var best = Math.max.apply(null, top.map(function (r) { return r.rescue_percent; }));
     var minV = Math.min(0, Math.min.apply(null, top.map(function (r) { return r.rescue_percent; })));
@@ -297,18 +325,31 @@
           backgroundColor: top.map(function (r) { return r.rescue_percent >= 0 ? BLUE : DARKRED; }) }] },
       options: o });
 
-    // Top 10 by mean |Δ| within the module (Supplementary S3, M_{p,C}).
-    var M = m.perturbations.map(function (p, i) {
-      var row = m.mean_delta[i], s = 0;
-      row.forEach(function (v) { s += Math.abs(v); });
-      return { p: p, v: s / row.length };
-    }).sort(function (a, b) { return b.v - a.v; }).slice(0, 10);
-    var o2 = baseOpts("Top 10 perturbations by mean |Δ| within module");
+    // Node-resolved responses of the two highest-ranked interventions
+    // (Supplementary Figs. S2-S3): mean paired Δ ± SD across 100 replicates.
+    var nodes = m.nodes;
+    var series = m.top2.map(function (lab, k) {
+      var j = m.perturbations.indexOf(lab);
+      var pct = m.all48[lab];
+      return {
+        label: (k + 1) + "  " + lab + "  (" + pct.toFixed(1) + "%)",
+        data: nodes.map(function (n, i) { return { x: m.mean_delta[j][i], y: n }; }),
+        errLow: nodes.map(function (n, i) { return m.mean_delta[j][i] - m.sd_delta[j][i]; }),
+        errHigh: nodes.map(function (n, i) { return m.mean_delta[j][i] + m.sd_delta[j][i]; }),
+        backgroundColor: k === 0 ? "rgb(33,92,176)" : "#fff",
+        borderColor: k === 0 ? "rgb(33,92,176)" : "rgb(217,94,31)",
+        errColor: k === 0 ? "rgb(33,92,176)" : "rgb(217,94,31)", errWidth: 1.5,
+        pointStyle: k === 0 ? "circle" : "rect", pointRadius: k === 0 ? 6 : 5, borderWidth: 1.6
+      };
+    });
+    var o2 = baseOpts("Node-resolved responses: two highest-ranked interventions");
     o2.indexAxis = "y";
-    o2.scales = { x: { title: { display: true, text: "Mean absolute change |Δ|" } }, y: { ticks: { autoSkip: false } } };
-    chart("rescue-m10", { type: "bar",
-      data: { labels: M.map(function (r) { return shortLabel(r.p); }), datasets: [{ data: M.map(function (r) { return r.v; }), backgroundColor: "#4c72b0" }] },
-      options: o2 });
+    o2.plugins.legend = { display: true, position: "bottom" };
+    o2.scales = { x: { title: { display: true, text: "Paired change from HL (activation, a.u.)" } },
+                  y: { type: "category", labels: nodes, offset: true, ticks: { autoSkip: false } } };
+    o2.plugins.thresholdLines = { axis: "x", lines: [{ value: 0, color: "#777", solid: true }] };
+    chart("rescue-pairs", { type: "scatter", plugins: [thresholdLines, errorBars],
+      data: { datasets: series }, options: o2 });
 
     var vmax = 0;
     m.mean_delta.forEach(function (row) { row.forEach(function (v) { vmax = Math.max(vmax, Math.abs(v)); }); });
@@ -317,14 +358,44 @@
       function (i, j) { return m.mean_delta[j][i]; },
       function (v) { return diverging(v, vmax); },
       function (v) { return Math.abs(v) < 0.005 ? "" : v.toFixed(2); });
-    setFigure(d, "slot-rescue", m.tag + "_rescue");
-    setFigure(d, "slot-rescue1", m.tag + "_rescue1");
+    setFigure(d, "slot-rescue", m.figure_file);
+    setFigure(d, "slot-rescue1", ["ECM", "GF", "TF", "CYT"].indexOf(m.tag) >= 0 ?
+      "NodeResolved_ECM_GF_TF_CYT" : "NodeResolved_MET_ION_SURV_OXI");
     document.getElementById("node-resolved-intro").textContent = d.node_resolved_intro;
+  }
+
+  function renderRescueStatic(d) {
+    var R = d.rescue_design;
+    document.getElementById("rescue-summary").textContent = d.rescue_summary || "";
+    document.getElementById("rescue-design").innerHTML =
+      "Suppression (clamp 0): " + esc(R.suppression.join(", ")) + ". Activation (clamp 1): " + esc(R.activation.join(", ")) +
+      ". " + R.n_singles + " single-node + " + R.n_duals + " dual-node (one activation + one suppression) = " +
+      (R.n_singles + R.n_duals) + " interventions. Rescue % = 100 × (1 − D<sub>p</sub> / D<sub>Hyper</sub>).";
+    document.getElementById("pheno-note").textContent =
+      "Mean activation of the eight-marker anabolic panel (" + R.anabolic_panel.join(", ") +
+      ") and the ten-marker catabolic panel (" + R.catabolic_panel.join(", ") +
+      ") under NL, HL and each intervention. Rank columns: position in the ECM and cytokine/chemokine/protease Top-20 rankings.";
+    var rankOf = {};
+    d.rescue.forEach(function (m) {
+      rankOf[m.category] = {};
+      m.top20.forEach(function (r, i) { rankOf[m.category][r.strategy] = i + 1; });
+    });
+    var t = "<thead><tr><th>Regime / intervention</th><th>ECM rank</th><th>Cytokine rank</th>" +
+      "<th>Anabolic mean</th><th>Catabolic mean</th></tr></thead><tbody>";
+    d.phenotype_panels.forEach(function (r) {
+      var lab = r.regime_or_intervention;
+      var e = (rankOf.ecm_matrix || {})[lab], c = (rankOf.cytokines_chemokines_proteases || {})[lab];
+      t += "<tr><td>" + esc(lab) + "</td><td>" + (e || "–") + "</td><td>" + (c || "–") + "</td><td>" +
+        r.anabolic_mean.toFixed(3) + "</td><td>" + r.catabolic_mean.toFixed(3) + "</td></tr>";
+    });
+    document.getElementById("pheno-table").innerHTML = t + "</tbody>";
   }
 
   function fillSelect(id, items, onChange) {
     var sel = document.getElementById(id);
-    sel.innerHTML = items.map(function (m, i) { return '<option value="' + i + '">' + m.title + "</option>"; }).join("");
+    sel.innerHTML = items.map(function (m, i) {
+      return '<option value="' + i + '">' + (m.figure ? m.figure + " (" + m.panel + ") — " : "") + m.title + "</option>";
+    }).join("");
     sel.addEventListener("change", function () { onChange(parseInt(sel.value, 10)); });
   }
 
@@ -337,11 +408,9 @@
       var renderers = {
         "#paper-topology": function () { renderTopology(d); },
         "#paper-baseline": function () { renderBaseline(d); },
-        "#paper-transitions": function () { renderTransitions(d, 0); renderRepresentative(d); },
         "#paper-falsification": function () { renderFalsification(d); },
-        "#paper-rescue": function () { renderRescue(d, 0); }
+        "#paper-rescue": function () { renderRescueStatic(d); renderRescue(d, 0); }
       };
-      fillSelect("trans-module", d.transition_modules, function (i) { renderTransitions(d, i); });
       fillSelect("rescue-module", d.rescue, function (i) { renderRescue(d, i); });
       // Charts need a visible canvas; draw each section the first time it is shown.
       function show(target) {
